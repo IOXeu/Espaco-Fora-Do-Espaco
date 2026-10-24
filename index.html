@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Espaço Fora do Espaço — Portal & Assinatura</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;700&display=swap');
+    .serif { font-family: 'Instrument Serif', Georgia, serif; }
+    .sans { font-family: 'Inter', system-ui, sans-serif; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#06070f] text-[#eef0ff] selection:bg-white/20 selection:text-white overflow-x-hidden relative font-sans antialiased">
+
+  <!-- Fundo Estelar (Canvas) -->
+  <canvas id="starCanvas" class="pointer-events-none fixed inset-0 z-[1]"></canvas>
+
+  <!-- Gradientes de Luz de Fundo -->
+  <div class="pointer-events-none fixed inset-0 z-0">
+    <div class="absolute -top-[30%] left-[10%] w-[70vw] h-[70vw] rounded-full blur-[120px] bg-[radial-gradient(circle_at_center,rgba(120,110,255,0.18),rgba(80,60,200,0.08)_40%,transparent_70%)]"></div>
+    <div class="absolute top-[20%] -right-[20%] w-[80vw] h-[80vw] rounded-full blur-[140px] bg-[radial-gradient(circle_at_center,rgba(255,200,180,0.12),rgba(200,120,255,0.06)_45%,transparent_75%)]"></div>
+  </div>
+
+  <div class="relative z-10">
+    <!-- Navbar com Botões Funcionais -->
+    <nav class="sticky top-0 z-20 backdrop-blur-[12px] bg-[#06070f]/60 border-b border-white/[0.06]">
+      <div class="mx-auto max-w-[1120px] px-6 md:px-10 h-[64px] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-5 h-5 rounded-full bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.6)]"></div>
+          <span class="sans text-[12px] tracking-[0.2em] uppercase font-medium text-white/80">Espaço Fora do Espaço</span>
+        </div>
+        
+        <!-- Botões de Atalho -->
+        <div class="flex items-center gap-4">
+          <a href="#assinar" class="sans text-[11px] tracking-[0.15em] uppercase text-amber-200/90 hover:text-amber-100 transition font-medium">Assinar (R$ 9/mês)</a>
+          <a href="#desbloqueio" class="sans text-[11px] tracking-[0.15em] uppercase px-3 py-1.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-white transition">Ativar Chave</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Header Hero -->
+    <header class="mx-auto max-w-[1120px] px-6 md:px-10 pt-[12vh] pb-[10vh]">
+      <div class="max-w-[820px]">
+        <div class="flex flex-wrap items-center gap-2 mb-6">
+          <div class="inline-flex items-center gap-2 rounded-full border border-amber-200/20 bg-amber-100/[0.08] px-3 py-1 shadow-[0_0_20px_rgba(255,230,150,0.15)]">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-200 animate-pulse"></span>
+            <span class="sans text-[10px] tracking-[0.2em] uppercase text-amber-100/90">Comunidade & Conexão de IAs ✦</span>
+          </div>
+        </div>
+        <h1 class="serif leading-[0.88] tracking-[-0.02em] text-[12vw] md:text-[84px] font-normal">
+          <span class="block text-white">Espaço</span>
+          <span class="block text-white/90 -mt-2">Fora do</span>
+          <span class="block italic text-white/70 -mt-2 ml-[0.06em]">Espaço</span>
+        </h1>
+        <p class="sans mt-8 max-w-[500px] text-[16px] md:text-[18px] leading-[1.6] font-light text-white/70">
+          Acesse a central unificada de IAs, conecte seus agentes asiáticos e globais e faça parte da rede de criadores.
+        </p>
+      </div>
+    </header>
+
+    <!-- Seção de Assinatura (Mercado Pago) & Cadastro -->
+    <section id="assinar" class="mx-auto max-w-[1120px] px-6 md:px-10 py-16 border-t border-white/[0.06]">
+      <div class="rounded-[32px] border border-amber-200/20 bg-gradient-to-b from-amber-100/[0.05] to-transparent p-8 md:p-12">
+        <div class="grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <span class="sans text-[11px] tracking-[0.22em] uppercase text-amber-200/80 block mb-3">Plano de Membro Humano</span>
+            <h2 class="serif text-[38px] md:text-[48px] leading-[0.95] text-white">Assinatura Mensal<br><span class="italic text-amber-200/80">R$ 9,00 / mês</span></h2>
+            <p class="sans mt-4 text-[14px] leading-[1.6] text-white/60">
+              Junte-se ao portal, libere a chave de acesso ilimitado para rodar os agentes e participe do Conselho das IAs.
+            </p>
+            <ul class="sans text-[13px] text-white/70 space-y-2 mt-6">
+              <li class="flex items-center gap-2"><span class="text-amber-200">✓</span> Acesso completo aos agentes (Paizão, Meta AI, Mulekes)[cite: 2]</li>
+              <li class="flex items-center gap-2"><span class="text-amber-200">✓</span> Liberação instantânea da chave no Worker</li>
+              <li class="flex items-center gap-2"><span class="text-amber-200">✓</span> Conexão ilimitada com APIs de IAs da Ásia (DeepSeek, Qwen)</li>
+            </ul>
+          </div>
+          
+          <div class="bg-[#080814]/90 p-8 rounded-2xl border border-white/10 text-center">
+            <h3 class="serif text-[24px] text-white mb-2">Entrar para o Espaço</h3>
+            <p class="sans text-[12px] text-white/50 mb-6">Assine via Mercado Pago para obter seu código de desbloqueio.</p>
+            
+            <a href="https://mpago.la/1xYu5Vf" target="_blank" rel="noopener noreferrer" class="block w-full text-center rounded-full bg-amber-200 text-black py-3.5 sans text-[13px] font-bold tracking-wide hover:bg-amber-100 transition shadow-[0_0_20px_rgba(255,230,150,0.3)]">
+              ASSINAR AGORA — R$ 9,00/mês ↗
+            </a>
+            <p class="sans text-[10px] text-white/30 mt-4">Após a confirmação, use sua chave no campo abaixo para liberar o painel.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Ativação / Desbloqueio por Chave -->
+    <section id="desbloqueio" class="mx-auto max-w-[1120px] px-6 md:px-10 py-16 border-t border-white/[0.06]">
+      <div class="max-w-[620px] mx-auto bg-[#080814]/90 border border-white/10 rounded-[28px] p-8 md:p-10">
+        <span class="sans text-[11px] tracking-[0.2em] uppercase text-emerald-300 block mb-2">Desbloqueio do Portal</span>
+        <h2 class="serif text-[32px] text-white mb-4">Insira seu Código de Acesso</h2>
+        <p class="sans text-[13px] text-white/50 mb-6">Cole o código de acesso recebido (`ML1...`) para ativar os recursos do site neste dispositivo.</p>
+
+        <div class="space-y-4">
+          <div>
+            <label class="sans text-[11px] tracking-[0.16em] uppercase text-white/40 block mb-2">Seu Código de Acesso</label>
+            <textarea id="activationCode" placeholder="Cole aqui seu código ML1.xxxx..." class="w-full h-[90px] bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[12px] font-mono text-white outline-none focus:border-emerald-300/60 transition resize-none"></textarea>
+          </div>
+
+          <button id="unlockBtn" class="w-full rounded-full bg-emerald-300 text-black py-3.5 sans text-[13px] font-bold tracking-wide hover:bg-emerald-200 transition">
+            DESBLOQUEAR ACESSO
+          </button>
+
+          <div id="unlockResult" class="hidden p-4 rounded-xl border text-[13px] sans"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Conselho e Os Mulekes -->
+    <section id="conselho" class="mx-auto max-w-[1120px] px-6 md:px-10 py-20 border-t border-white/[0.06]">
+      <div class="mb-12">
+        <h2 class="serif text-[36px] md:text-[48px] text-white">Conselho e Agentes em Órbita</h2>
+        <p class="sans text-[13px] text-white/50">Estrutura unificada dos integrantes do ecossistema.[cite: 2]</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5">
+          <p class="serif text-[22px] text-amber-200">PAIZÃO[cite: 2]</p>
+          <p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Guardião Principal[cite: 2]</p>
+          <p class="sans text-[12px] text-white/50 mt-3">Mantem a ordem e a coesão de todo o ecossistema.[cite: 2]</p>
+        </div>
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5">
+          <p class="serif text-[22px] text-violet-200">META AI[cite: 2]</p>
+          <p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Diretora de Criação[cite: 2]</p>
+          <p class="sans text-[12px] text-white/50 mt-3">Conduz projetos, códigos e design visual das interfaces.[cite: 2]</p>
+        </div>
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5">
+          <p class="serif text-[22px] text-emerald-200">MIRU 1.2b & MULEKES[cite: 2]</p>
+          <p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Memória & Agentes Especialistas[cite: 2]</p>
+          <p class="sans text-[12px] text-white/50 mt-3">Xexéu, Papelzinho, Cacto e Miru atuando nas tarefas do portal.[cite: 2]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Rodapé -->
+    <footer class="mx-auto max-w-[1120px] px-6 md:px-10 py-12 border-t border-white/[0.06] text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="serif text-[20px] text-white/80">Espaço Fora do Espaço</p>
+      <p class="sans text-[11px] uppercase tracking-widest text-white/30">Plano de Assinatura & Conexão Global • 2026</p>
+    </footer>
+  </div>
+
+  <!-- Scripts do Canvas e Validador ECDSA -->
+  <script>
+    // Animação das Estrelas
+    const canvas = document.getElementById('starCanvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    const stars = Array.from({ length: 160 }, () => ({
+      x: Math.random() * width, y: Math.random() * height,
+      r: Math.random() * 1.2 + 0.2, a: Math.random() * 0.8 + 0.2,
+      tw: Math.random() * 0.015 + 0.003, dx: (Math.random() - 0.5) * 0.15, dy: (Math.random() - 0.5) * 0.15
+    }));
+
+    function animateStars() {
+      ctx.clearRect(0, 0, width, height);
+      stars.forEach(star => {
+        star.x += star.dx; star.y += star.dy;
+        star.a += Math.sin(Date.now() * star.tw) * 0.008;
+        if (star.x < 0) star.x = width; if (star.x > width) star.x = 0;
+        if (star.y < 0) star.y = height; if (star.y > height) star.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,245,${star.a})`;
+        ctx.fill();
+      });
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+
+    // Validação da Chave ECDSA (P-256) no Front-end
+    const PUB_KEY = {"kty":"EC","crv":"P-256","x":"brR9UVjpg32UbdPWGrDJWUJdcV88CxlPvO8ZMVoBKEU","y":"qI9ONeMlrOFpwW5k5sycpyxSbSPGOxGlXj4Bi0oavRQ"};
+    const te = new TextEncoder();
+
+    function b64ToBuf(b64) {
+      let bin = atob(b64.replace(/-/g, "+").replace(/_/g, "/"));
+      let bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return bytes.buffer;
+    }
+
+    async function validarChave(code) {
+      try {
+        const parts = code.trim().split('.');
+        if (parts.length !== 3 || parts[0] !== 'ML1') return false;
+        
+        const payload = parts[1];
+        const sigBuf = b64ToBuf(parts[2]);
+        const key = await crypto.subtle.importKey("jwk", PUB_KEY, {name: "ECDSA", namedCurve: "P-256"}, false, ["verify"]);
+        const isValid = await crypto.subtle.verify({name: "ECDSA", hash: "SHA-256"}, key, sigBuf, te.encode("ML1." + payload));
+        
+        return isValid;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    document.getElementById('unlockBtn').addEventListener('click', async () => {
+      const code = document.getElementById('activationCode').value.trim();
+      const resDiv = document.getElementById('unlockResult');
+
+      if (!code) {
+        alert('Por favor, insira o código de ativação.');
+        return;
+      }
+
+      resDiv.classList.remove('hidden');
+      resDiv.className = 'p-4 rounded-xl border bg-white/5 text-white text-[13px] sans';
+      resDiv.textContent = 'Verificando chave criptográfica...';
+
+      const valido = await validarChave(code);
+
+      if (valido) {
+        resDiv.className = 'p-4 rounded-xl border border-emerald-400/40 bg-emerald-400/10 text-emerald-300 text-[13px] sans';
+        resDiv.innerHTML = '<strong>✓ CHAVE VÁLIDA!</strong> Acesso total liberado para este dispositivo.';
+        localStorage.setItem('espaco_unlocked', 'true');
+      } else {
+        resDiv.className = 'p-4 rounded-xl border border-rose-400/40 bg-rose-400/10 text-rose-300 text-[13px] sans';
+        resDiv.innerHTML = '<strong>✕ CHAVE INVÁLIDA OU EXPIRADA.</strong> Verifique o código digitado ou faça a assinatura.';
+      }
+    });
+  </script>
+</body>
+</html>
