@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💬 Sala Comunitária | Bate-Papo</title>
+    <style>
+        :root { 
+            --bg: #0f172a; 
+            --panel: #1e293b; 
+            --text: #e2e8f0; 
+            --accent: #38bdf8; 
+            --color-1: #4ade80; 
+            --color-2: #c084fc; 
+            --color-3: #fb923c; 
+            --color-4: #60a5fa; 
+            --border: #334155;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* HEADER RESPONSIVO */
+        header { 
+            background: var(--panel); padding: 12px 20px; border-bottom: 1px solid var(--border); 
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+        .brand { font-size: 1.1rem; font-weight: bold; color: var(--accent); display: flex; gap: 8px; align-items: center; }
+        .status { font-size: 0.75rem; color: #94a3b8; background: rgba(56, 189, 248, 0.1); padding: 4px 8px; border-radius: 4px; border: 1px solid var(--accent); }
+
+        /* CONTAINER PRINCIPAL */
+        main { flex: 1; display: flex; overflow: hidden; }
+
+        /* SIDEBAR / MENU DE PARTICIPANTES */
+        aside { 
+            width: 250px; background: var(--panel); border-right: 1px solid var(--border); 
+            padding: 15px; display: flex; flex-direction: column; gap: 10px; overflow-y: auto;
+        }
+        .aside-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; margin-bottom: 5px; }
+        
+        .user-card { 
+            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; cursor: pointer; 
+            transition: 0.2s; border-left: 4px solid transparent; display: flex; align-items: center; gap: 10px;
+        }
+        .user-card:hover { background: rgba(255,255,255,0.1); }
+        .user-card.active { background: rgba(56, 189, 248, 0.1); border-left-color: var(--accent); }
+        
+        .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; color: white; flex-shrink: 0; }
+        .av-1 { background: var(--color-1); color: #064e3b; }
+        .av-2 { background: var(--color-2); }
+        .av-3 { background: var(--color-3); }
+        .av-4 { background: var(--color-4); }
+
+        .user-info h4 { font-size: 0.85rem; color: var(--text); }
+        .user-info p { font-size: 0.7rem; color: #94a3b8; }
+
+        /* ÁREA DO CHAT */
+        .chat-area { flex: 1; display: flex; flex-direction: column; position: relative; }
+        
+        .tools-bar { padding: 8px 15px; background: rgba(0,0,0,0.2); display: flex; gap: 10px; justify-content: flex-end; }
+        .tool-btn { background: transparent; border: 1px solid var(--border); color: #94a3b8; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
+        .tool-btn:hover { color: var(--text); border-color: var(--text); }
+
+        .messages-container { 
+            flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; 
+            scroll-behavior: smooth;
+        }
+        
+        /* BALÕES DE MENSAGEM RESPONSIVOS */
+        .msg-wrapper { display: flex; gap: 8px; max-width: 85%; animation: fadeIn 0.25s ease; }
+        .msg-wrapper.right { align-self: flex-end; flex-direction: row-reverse; }
+        
+        .msg-bubble { 
+            padding: 10px 14px; border-radius: 12px; font-size: 0.9rem; line-height: 1.4; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); word-break: break-word; position: relative;
+        }
+        .msg-meta { font-size: 0.65rem; opacity: 0.75; margin-top: 4px; display: block; text-align: right; }
+        
+        .bubble-1 { background: var(--color-1); color: #064e3b; border-bottom-right-radius: 2px; }
+        .bubble-2 { background: var(--color-2); color: #fff; border-bottom-left-radius: 2px; }
+        .bubble-3 { background: var(--color-3); color: #fff; border-bottom-left-radius: 2px; }
+        .bubble-4 { background: var(--color-4); color: #fff; border-bottom-left-radius: 2px; }
+        .bubble-system { background: var(--border); color: #cbd5e1; font-style: italic; text-align: center; align-self: center; max-width: 100%; border-radius: 20px; padding: 6px 14px; font-size: 0.75rem;}
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ÁREA DE DIGITAÇÃO */
+        .input-zone { 
+            background: var(--panel); padding: 12px 15px; border-top: 1px solid var(--border); 
+            display: flex; gap: 10px; align-items: flex-end;
+        }
+        textarea { 
+            flex: 1; background: var(--bg); border: 1px solid var(--border); color: var(--text); 
+            padding: 10px; border-radius: 8px; resize: none; outline: none; font-family: inherit; min-height: 45px; max-height: 120px; font-size: 0.9rem;
+        }
+        textarea:focus { border-color: var(--accent); }
+        
+        .controls { display: flex; flex-direction: column; gap: 5px; }
+        button.send-btn { 
+            background: var(--accent); color: #0f172a; border: none; padding: 10px 16px; 
+            border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; height: 45px;
+        }
+        button.send-btn:hover { filter: brightness(1.1); }
+        
+        select.sender-select { 
+            background: var(--bg); color: var(--text); border: 1px solid var(--border); 
+            padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; width: 100%; outline: none;
+        }
+
+        /* MEDIA QUERIES PARA CELULAR (RESPONSIVIDADE COMPLETA) */
+        @media (max-width: 768px) {
+            main { flex-direction: column; }
+            aside { 
+                width: 100%; height: auto; max-height: 90px; border-right: none; border-bottom: 1px solid var(--border); 
+                flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 8px 12px; gap: 8px;
+            }
+            .aside-title { display: none; }
+            .user-card { padding: 6px 10px; flex-shrink: 0; border-left: none; border-bottom: 3px solid transparent; }
+            .user-card.active { border-left-color: transparent; border-bottom-color: var(--accent); }
+            .msg-wrapper { max-width: 92%; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">💬 Sala Comunitária de Bate-Papo</div>
+    <div class="status">Sincronização Local • Ativo</div>
+</header>
+
+<main>
+    <!-- SIDEBAR DE INTEGRANTES -->
+    <aside id="userList">
+        <div class="aside-title">Integrantes</div>
+        <!-- Gerado via JS -->
+    </aside>
+
+    <!-- ÁREA DE CONVERSA -->
+    <section class="chat-area">
+        <div class="tools-bar">
+            <button class="tool-btn" onclick="exportChat()">📥 Exportar JSON</button>
+            <button class="tool-btn" onclick="clearChat()">🗑️ Limpar Conversas</button>
+        </div>
+        
+        <div class="messages-container" id="chatLog">
+            <div class="msg-wrapper">
+                <div class="msg-bubble bubble-system">
+                    Bem-vindo à sala! Escolha um perfil abaixo para interagir ou testar o envio de mensagens.
+                </div>
+            </div>
+        </div>
+
+        <div class="input-zone">
+            <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                <select id="senderSelect" class="sender-select" onchange="changeIdentity(this.value)">
+                    <option value="p1">👤 Participante 01</option>
+                    <option value="p2">👤 Participante 02</option>
+                    <option value="p3">👤 Participante 03</option>
+                    <option value="p4">👤 Participante 04</option>
+                </select>
+                <textarea id="msgInput" placeholder="Digite uma mensagem..." onkeydown="handleKey(event)"></textarea>
+            </div>
+            <div class="controls">
+                <button class="send-btn" onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+const STORAGE_KEY = 'espaco_sala_comunidade_chat';
+let messages = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+let currentSender = 'p1';
+
+const PROFILES = {
+    p1: { name: 'Participante 01', role: 'Membro', class: 'av-1', bubble: 'bubble-1', icon: 'P1' },
+    p2: { name: 'Participante 02', role: 'Membro', class: 'av-2', bubble: 'bubble-2', icon: 'P2' },
+    p3: { name: 'Participante 03', role: 'Membro', class: 'av-3', bubble: 'bubble-3', icon: 'P3' },
+    p4: { name: 'Participante 04', role: 'Membro', class: 'av-4', bubble: 'bubble-4', icon: 'P4' }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderSidebar();
+    renderMessages();
+});
+
+function changeIdentity(key) {
+    currentSender = key;
+    renderSidebar();
+    document.getElementById('msgInput').focus();
+}
+
+function renderSidebar() {
+    const list = document.getElementById('userList');
+    list.innerHTML = '<div class="aside-title">Integrantes</div>';
+    
+    Object.keys(PROFILES).forEach(key => {
+        const p = PROFILES[key];
+        const isActive = key === currentSender ? 'active' : '';
+        list.innerHTML += `
+            <div class="user-card ${isActive}" onclick="selectProfile('${key}')">
+                <div class="avatar ${p.class}">${p.icon}</div>
+                <div class="user-info">
+                    <h4>${p.name}</h4>
+                    <p>${p.role}</p>
+                </div>
+            </div>
+        `;
+    });
+}
+
+function selectProfile(key) {
+    currentSender = key;
+    document.getElementById('senderSelect').value = key;
+    renderSidebar();
+    document.getElementById('msgInput').focus();
+}
+
+function sendMessage() {
+    const input = document.getElementById('msgInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const newMsg = {
+        id: Date.now(),
+        sender: currentSender,
+        text: text,
+        timestamp: new Date().toISOString()
+    };
+
+    messages.push(newMsg);
+    saveStorage();
+    renderSingleMessage(newMsg);
+    input.value = '';
+    scrollToBottom();
+}
+
+function renderMessages() {
+    const container = document.getElementById('chatLog');
+    container.innerHTML = '';
+    
+    if (messages.length === 0) {
+         container.innerHTML = `<div class="msg-wrapper"><div class="msg-bubble bubble-system">Nenhuma mensagem enviada ainda. Comece a conversar!</div></div>`;
+         return;
+    }
+
+    messages.forEach(msg => renderSingleMessage(msg));
+    scrollToBottom();
+}
+
+function renderSingleMessage(msg) {
+    const container = document.getElementById('chatLog');
+    const profile = PROFILES[msg.sender] || PROFILES.p1;
+    const isPrimary = msg.sender === 'p1';
+    const alignment = isPrimary ? 'right' : 'left';
+    
+    const timeStr = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const wrapper = document.createElement('div');
+    wrapper.className = `msg-wrapper ${alignment}`;
+    wrapper.innerHTML = `
+        <div class="avatar ${profile.class}" style="width:24px;height:24px;font-size:0.6rem;margin-top:4px;">${profile.icon}</div>
+        <div class="msg-bubble ${profile.bubble}">
+            <strong style="font-size: 0.75rem; display:block; margin-bottom:2px; opacity:0.9;">${profile.name}</strong>
+            ${escapeHtml(msg.text)}
+            <span class="msg-meta">${timeStr}</span>
+        </div>
+    `;
+    container.appendChild(wrapper);
+}
+
+function saveStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+}
+
+function clearChat() {
+    if(confirm("Deseja apagar o histórico de conversas?")) {
+        messages = [];
+        saveStorage();
+        renderMessages();
+    }
+}
+
+function exportChat() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(messages, null, 2));
+    const dl = document.createElement('a');
+    dl.setAttribute("href", dataStr);
+    dl.setAttribute("download", `chat_comunidade_${new Date().toISOString().slice(0,10)}.json`);
+    document.body.appendChild(dl);
+    dl.click();
+    dl.remove();
+}
+
+function escapeHtml(text) {
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+}
+
+function scrollToBottom() {
+    const container = document.getElementById('chatLog');
+    container.scrollTop = container.scrollHeight;
+}
+
+function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+    }
+}
+</script>
+</body>
+</html>
