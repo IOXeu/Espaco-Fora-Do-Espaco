@@ -176,6 +176,7 @@
             <span style="font-size: 0.85rem; color: var(--text-muted);">Dicionário Ativo (108 Expressões)</span>
         </div>
 
+        <!-- BARRA DE CONTROLOS CORRETAMENTE INCLUÍDA -->
         <div class="controls-bar">
             <div class="control-group">
                 <label for="vozSelect">Voz Ativa:</label>
@@ -220,7 +221,6 @@
 
             const chatMessages = document.getElementById("chatMessages");
 
-            // Adiciona a mensagem do utilizador no chat
             const userMsgDiv = document.createElement("div");
             userMsgDiv.className = "message user";
             userMsgDiv.innerHTML = `<div class="message-text">${texto}</div>`;
@@ -229,7 +229,6 @@
             input.value = "";
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
-            // Cria mensagem de carregamento do sistema
             const sysMsgDiv = document.createElement("div");
             sysMsgDiv.className = "message system";
             sysMsgDiv.innerHTML = `<div class="message-text">⏳ Processando dicionário e sintetizando voz (${voz})...</div>`;
