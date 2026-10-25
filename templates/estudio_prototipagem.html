@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 Estúdio de Prototipagem - Espaço Além do Espaço</title>
+    <link rel="stylesheet" href="/static/css/estudio.css">
+    <!-- ffmpeg.wasm para gerar vídeo real no navegador -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/util@0.12.1/dist/umd/util.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 Estúdio de Prototipagem de Vídeo</h1>
+            <p>Crie, teste e gere prévias reais gratuitamente</p>
+            <span class="badge-free">✨ PRÉVIA GRÁTIS - Vídeo real no seu navegador</span>
+        </header>
+
+        <div class="stats-bar">
+            <div class="stat-item"><div class="stat-value" id="sceneCount">0</div><div class="stat-label">Cenas</div></div>
+            <div class="stat-item"><div class="stat-value" id="wordCount">0</div><div class="stat-label">Palavras</div></div>
+            <div class="stat-item"><div class="stat-value" id="durationEstimate">0s</div><div class="stat-label">Duração Est.</div></div>
+            <div class="stat-item"><div class="stat-value" style="color: #00e676;">R$ 0,00</div><div class="stat-label">Custo Prévia</div></div>
+        </div>
+
+        <div class="workspace">
+            <div class="panel">
+                <h2>✏️ Editor de Roteiro</h2>
+                <div class="form-group">
+                    <label for="videoTitle">📌 Título do Vídeo</label>
+                    <input type="text" id="videoTitle" placeholder="Ex: Introdução ao meu produto...">
+                </div>
+                <div class="form-group">
+                    <label for="videoStyle">🎨 Estilo Visual</label>
+                    <select id="videoStyle">
+                        <option value="reels">Reels/TikTok (Vertical 9:16)</option>
+                        <option value="youtube">YouTube (Horizontal 16:9)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="newSceneText">➕ Nova Cena / Narração</label>
+                    <textarea id="newSceneText" placeholder="Escreva o texto desta cena..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="sceneColor">🎨 Cor de Fundo da Cena</label>
+                    <input type="color" id="sceneColor" value="#1a0a2e" style="height: 45px; padding: 5px;">
+                </div>
+                <button class="btn btn-primary" onclick="EstudioPrototipagem.addScene()">➕ Adicionar Cena</button>
+                
+                <div class="tip-box">
+                    <strong>💡 Como funciona:</strong><br>
+                    1. Adicione quantas cenas quiser (grátis)<br>
+                    2. Clique em "Gerar Prévia" → o vídeo é criado <strong>no seu navegador</strong><br>
+                    3. Assista, ajuste, repita quantas vezes quiser<br>
+                    4. Só pague quando quiser a versão final com IA real
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>👁️ Player de Vídeo Real</h2>
+                
+                <!-- PLAYER REAL COM CONTROLES -->
+                <div class="video-container">
+                    <video id="videoPlayer" controls style="width: 100%; border-radius: 10px; background: #000;">
+                        Seu navegador não suporta vídeo HTML5.
+                    </video>
+                    <div id="videoPlaceholder" class="preview-placeholder">
+                        <div class="icon">🎥</div>
+                        <p>Adicione cenas e clique em "Gerar Prévia"</p>
+                    </div>
+                </div>
+
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: #a0a0c0;" id="progressText">Gerando vídeo...</span>
+                        <span style="color: #60d0ff;" id="progressPercent">0%</span>
+                    </div>
+                    <div class="timeline-bar">
+                        <div class="timeline-progress" id="renderProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-success" onclick="EstudioPrototipagem.generateVideo()" id="btnGenerate">
+                        ▶️ Gerar Prévia Real (Grátis)
+                    </button>
+                    <button class="btn btn-secondary" onclick="EstudioPrototipagem.downloadVideo()" id="btnDownload" disabled>
+                        💾 Baixar MP4
+                    </button>
+                </div>
+
+                <h3 style="margin-top: 25px; color: #8a60ff; margin-bottom: 15px;">📋 Cenas do Projeto</h3>
+                <div class="scene-list" id="sceneList">
+                    <p style="color: #606080; text-align: center; padding: 20px;">Nenhuma cena adicionada ainda</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cost-calculator">
+            <h2>💰 Custo da Versão Final com IA</h2>
+            <p style="color: #a0a0c0; margin-bottom: 20px;">
+                A prévia acima é <strong style="color: #00e676;">100% gratuita</strong>. 
+                Veja quanto custará a versão final com locução profissional, imagens 4K e trilha sonora:
+            </p>
+            <div class="cost-breakdown">
+                <div class="cost-item"><div class="label">🎙️ Locução (TTS)</div><div class="value" id="costTTS">R$ 0,00</div></div>
+                <div class="cost-item"><div class="label">🎵 Trilha Sonora</div><div class="value" id="costMusic">R$ 0,00</div></div>
+                <div class="cost-item"><div class="label">🎬 Geração de Vídeo IA</div><div class="value" id="costVideo">R$ 0,00</div></div>
+                <div class="cost-item"><div class="label">🤖 Avatar (opcional)</div><div class="value" id="costAvatar">R$ 0,00</div></div>
+            </div>
+            <div class="total-cost">
+                <div style="color: #a0a0c0; margin-bottom: 10px;">CUSTO TOTAL ESTIMADO (VERSÃO FINAL)</div>
+                <div class="amount" id="totalCost">R$ 0,00</div>
+            </div>
+            <div class="actions-bar" style="justify-content: center; margin-top: 25px;">
+                <button class="btn btn-warning" onclick="EstudioPrototipagem.requestProduction()" id="btnProduce" disabled>
+                    🚀 Produzir Versão Final com IA (Paga)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/estudio_prototipagem.js"></script>
+</body>
+</html>
