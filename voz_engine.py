@@ -6,7 +6,7 @@ VOZES_DISPONIVEIS = {
     "francisca": "pt-BR-FranciscaNeural",          # Feminina / Alegre / Comercial
     "thalita": "pt-BR-ThalitaMultilingualNeural",   # Feminina / Dinâmica
     "antonio": "pt-BR-AntonioNeural",               # Masculino / Profissional
-    "humberto": "pt-BR-HumbertoNeural",             # Masculino / Promocional
+    "humberto": "pt-BR-AntonioNeural",              # Masculino / Promocional (Mapeado com segurança)
 }
 
 async def gerar_fala_async(
@@ -22,7 +22,7 @@ async def gerar_fala_async(
     try:
         communicate = edge_tts.Communicate(texto, voice=voz, rate=rate, pitch=pitch)
         await communicate.save(caminho_saida)
-        print(f"✅ [voz_engine] Áudio gerado: {caminho_saida} (Voz: {voz})")
+        print(f"✅ [voz_engine] Áudio gerado com sucesso: {caminho_saida} (Voz: {voz})")
         return True
     except Exception as e:
         print(f"❌ [voz_engine] Erro ao gerar áudio: {e}")
