@@ -1,0 +1,53 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "espaco-fora-do-espaco",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-24",
+
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_id": "efd8507c-417c-4389-95e2-de76fa7a7ced"
+    }
+  ],
+
+  "kv_namespaces": [
+    {
+      "binding": "CHAVES_USADAS",
+      "id": "38d7848ddfaa4d45ae82276b306e48fb"
+    }
+  ],
+
+  "secrets": {
+    "required": [
+      "BRIA_FIBO_EDIT_API_KEY",
+      "BRIA_FIBO_GENERATE_API_KEY",
+      "ELEVENLABS_FLASH_API_KEY",
+      "ELEVENLABS_MUSIC_API_KEY",
+      "ELEVENLABS_TURBO_API_KEY",
+      "ELEVENLABS_V3_API_KEY",
+      "GOOGLE_AI_API_KEY",
+      "KREA_KREA_3_API_KEY",
+      "MINIMAX_H3_MAX_API_KEY",
+      "MINIMAX_M3_FLASH_API_KEY",
+      "MP_ACCESS_TOKEN",
+      "MP_CLIENT_ID",
+      "MP_CLIENT_SECRET",
+      "MP_WEBHOOK_SECRET",
+      "PRIVATE_KEY_JWK",
+      "PRUNA_ANIMATE_API_KEY",
+      "PRUNA_AVATAR_API_KEY",
+      "PRUNA_VIDEO_API_KEY",
+      "XAI_API_KEY"
+    ]
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}
