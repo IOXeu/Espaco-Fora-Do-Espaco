@@ -196,4 +196,185 @@ async function gerarChave(request, env) {
 
 async function validarUso(request, env) {
   const { codigo } = await request.json();
-  if (!codigo) return json({ valido: false, msg: 'C
+  if (!codigo) return json({ valido: false, msg: 'Código ausente' }, 400);
+  const stored = await env.CHAVES_USADAS.get(codigo);
+  if (stored) {
+    const data = JSON.parse(stored);
+    if (data.status === 'consumido')
+      return json({ valido: false, msg: '✕ Esta chave já foi resgatada.' });
+  }
+  const isValid = await verifySignature(codigo);
+  if (!isValid) return json({ valido: false, msg: '✕ Assinatura inválida ou chave falsa.' }, 403);
+  await env.CHAVES_USADAS.put(codigo, JSON.stringify({ status: 'consumido', consumed: Date.now() }));
+  return json({ valido: true, msg: '✓ Acesso liberado à Sala VIP e IAs!' });
+}
+
+async function proxyIA(request, env) {
+  const { modelo, prompt, ...params } = await request.json();
+  const route = AI_ROUTES[modelo];
+  if (!route) return json({ error: `Modelo '${modelo}' não encontrado`, modelos: Object.keys(PRECOS) }, 404);
+  const apiKey = env[route.key];
+  if (!apiKey) return json({ error: `API key não configurada para ${modelo}` }, 500);
+  const cobranca = calcularPreco(modelo, prompt, params);
+  try {
+    const result = await callAI(route.provider, modelo, apiKey, prompt, params);
+    return json({ status: 'sucesso', modelo, resposta: result, cobranca: { valor: cobranca.valor, unidade: cobranca.unidade, descricao: PRECOS[modelo]?.desc } });
+  } catch (err) { return json({ error: err.message, modelo }, 500); }
+}
+
+async function listarPrecos() {
+  return json({
+    assinatura: { valor: PRECO_ASSINATURA, unidade: 'mes' },
+    servicos: Object.entries(PRECOS).map(([key, p]) => ({ id: key, ia: p.ia, desc: p.desc, preco: p.preco, unidade: p.unidade })),
+  });
+}
+
+async function callAI(provider, model, apiKey, prompt, params) {
+  switch (provider) {
+    case 'google':     return callGoogleAI(model, apiKey, prompt, params);
+    case 'xai':        return callXAI(model, apiKey, prompt, params);
+    case 'xai_tts':    return callGrokTTS(apiKey, prompt, params);
+    case 'elevenlabs': return callElevenLabs(model, apiKey, prompt, params);
+    case 'bria':       return callBria(model, apiKey, prompt, params);
+    case 'krea':       return callKrea(apiKey, prompt, params);
+    case 'pruna':      return callPruna(model, apiKey, prompt, params);
+    case 'minimax':    return callMiniMaxVideo(model, apiKey, prompt, params);
+    default: throw new Error(`Provider ${provider} não implementado`);
+  }
+}
+
+async function callGoogleAI(model, apiKey, prompt, params) {
+  const modelMap = { 'gemini-pro': 'gemini-pro', 'gemini-flash': 'gemini-1.5-flash', 'gemini-2.0-flash': 'gemini-2.0-flash' };
+  const name = modelMap[model] || model;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${name}:generateContent?key=${apiKey}`;
+  const resp = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], ...params }) });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.error?.message || 'Erro Google AI');
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta';
+}
+
+async function callXAI(model, apiKey, prompt, params) {
+  const resp = await fetch('https://api.x.ai/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }], ...params }),
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.error?.message || 'Erro xAI');
+  return data.choices?.[0]?.message?.content || 'Sem resposta';
+}
+
+async function callGrokTTS(apiKey, prompt, params) {
+  const resp = await fetch('https://api.x.ai/v1/audio/speech', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: 'grok-tts', input: prompt, voice: params.voice || 'alloy', ...params }),
+  });
+  if (!resp.ok) { const data = await resp.json().catch(() => ({})); throw new Error(data.error?.message || 'Erro Grok-TTS'); }
+  const audioBuf = await resp.arrayBuffer();
+  return { audio: bufToB64Url(audioBuf), format: 'mp3' };
+}
+
+async function callElevenLabs(model, apiKey, prompt, params) {
+  if (model === 'elevenlabs-music') {
+    const resp = await fetch('https://api.elevenlabs.io/v1/music', {
+      method: 'POST',
+      headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, ...params }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.detail?.message || 'Erro ElevenLabs Music');
+    return data;
+  }
+  const voiceId = params.voice_id || '21m00Tcm4TlvDqIKibV3';
+  const modelId = model.includes('turbo') ? 'eleven_turbo_v2_5' : model.includes('flash') ? 'eleven_flash_v2_5' : 'eleven_multilingual_v3';
+  const resp = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
+    method: 'POST',
+    headers: { 'xi-api-key': apiKey, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
+    body: JSON.stringify({ text: prompt, model_id: modelId, ...params }),
+  });
+  if (!resp.ok) { const data = await resp.json().catch(() => ({})); throw new Error(data.detail?.message || 'Erro ElevenLabs'); }
+  const audioBuf = await resp.arrayBuffer();
+  return { audio: bufToB64Url(audioBuf), format: 'mp3' };
+}
+
+async function callBria(model, apiKey, prompt, params) {
+  const endpoint = model.includes('edit') ? 'https://api.bria.ai/v1/eraser' : 'https://api.bria.ai/v1/text-to-image';
+  const resp = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, ...params }),
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.message || 'Erro BRIA');
+  return data;
+}
+
+async function callKrea(apiKey, prompt, params) {
+  const resp = await fetch('https://api.krea.ai/v1/images/generations', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, ...params }),
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.message || 'Erro KREA');
+  return data;
+}
+
+async function callPruna(model, apiKey, prompt, params) {
+  let endpoint = 'https://api.pruna.ai/v1/video/generate';
+  let body = { prompt, ...params };
+  if (model.includes('animate')) { endpoint = 'https://api.pruna.ai/v1/animate/generate'; }
+  else if (model.includes('avatar')) { endpoint = 'https://api.pruna.ai/v1/avatar/generate'; body.resolution = model.includes('1080p') ? '1080p' : '720p'; }
+  else if (model.includes('draft')) { body.quality = 'draft'; body.resolution = '720p'; }
+  else if (model.includes('padrao')) { body.quality = 'standard'; body.resolution = '720p'; }
+  else if (model.includes('alta')) { body.quality = 'high'; body.resolution = '1080p'; }
+  const resp = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.message || 'Erro Pruna');
+  return data;
+}
+
+async function callMiniMaxVideo(model, apiKey, prompt, params) {
+  const resolution = model.includes('2k') ? '2k' : model.includes('768') ? '768p' : '480p';
+  const resp = await fetch('https://api.minimaxi.com/v1/video_generation', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: 'video-01', prompt, resolution, ...params }),
+  });
+  const data = await resp.json();
+  if (!resp.ok) throw new Error(data.base_resp?.status_msg || 'Erro MiniMax Video');
+  return data;
+}
+
+export default {
+  async fetch(request, env) {
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const method = request.method;
+    if (method === 'OPTIONS') {
+      return new Response(null, {
+        headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' },
+      });
+    }
+    const routes = {
+      '/mp/criar-pagamento': { POST: () => criarPagamentoMP(request, env) },
+      '/mp/webhook':         { GET: () => json({ status: 'ok' }), POST: () => webhookMP(request, env) },
+      '/gerar-chave':        { POST: () => gerarChave(request, env) },
+      '/validar-uso':        { POST: () => validarUso(request, env) },
+      '/api/ia':             { POST: () => proxyIA(request, env) },
+      '/api/precos':         { GET: () => listarPrecos() },
+    };
+    const route = routes[path];
+    if (route && route[method]) {
+      try { return await route[method](); }
+      catch (err) { return json({ error: err.message }, 500); }
+    }
+    if (env.ASSETS) return env.ASSETS.fetch(request);
+    return new Response('Endpoint não encontrado', { status: 404 });
+  },
+};
