@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎬 Gerador de Vídeo - Espaço Além do Espaço</title>
+    <title>🎬 Gerador de Vídeo Regional - Espaço Além do Espaço</title>
     <link rel="stylesheet" href="/assets/css/estudio.css">
-    <!-- Motor de vídeo no navegador -->
+    <!-- Motor de vídeo FFmpeg.wasm -->
     <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.12.10/dist/umd/ffmpeg.js"></script>
 </head>
 <body>
@@ -24,24 +24,24 @@
         </div>
 
         <div class="workspace">
-            <!-- EDITOR -->
+            <!-- COLUNA 1: EDITOR -->
             <div class="panel">
-                <h2>✏️ Editor de Cenas</h2>
+                <h2>️ Editor de Cenas</h2>
                 
                 <div class="form-group">
-                    <label for="regiaoSelect">🗺️ Região</label>
-                    <select id="regiaoSelect">
-                        <option value="Geral">🇧 Brasil Geral</option>
-                        <option value="Norte">🌳 Norte</option>
-                        <option value="Nordeste">☀️ Nordeste</option>
-                        <option value="Sudeste">🏙️ Sudeste</option>
-                        <option value="Sul">🧉 Sul</option>
+                    <label for="regiaoSelect">🗺️ Região das Gírias</label>
+                    <select id="regiaoSelect" onchange="GeradorVideo.carregarGirias()">
+                        <option value="Geral">🇧🇷 Brasil Geral</option>
+                        <option value="Norte"> Norte (PA, AM...)</option>
+                        <option value="Nordeste">☀️ Nordeste (BA, PE...)</option>
+                        <option value="Sudeste">🏙️ Sudeste (SP, RJ...)</option>
+                        <option value="Sul">🧉 Sul (RS, SC...)</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label>💡 Gírias Disponíveis (clique para usar)</label>
-                    <div id="gíriasList" class="gírias-container"></div>
+                    <div id="gíriasList" class="gírias-container">Carregando dicionário...</div>
                 </div>
 
                 <div class="form-group">
@@ -51,50 +51,52 @@
 
                 <div class="form-group">
                     <label for="sceneColor">🎨 Cor de Fundo</label>
-                    <input type="color" id="sceneColor" value="#1a0a2e">
+                    <input type="color" id="sceneColor" value="#1a0a2e" style="width:100%; height:40px;">
                 </div>
 
-                <button class="btn btn-primary" onclick="GeradorVideo.addScene()">➕ Adicionar Cena</button>
+                <button class="btn btn-primary" onclick="GeradorVideo.adicionarCena()">➕ Adicionar Cena</button>
             </div>
 
-            <!-- PLAYER -->
+            <!-- COLUNA 2: PLAYER -->
             <div class="panel">
                 <h2>👁️ Prévia do Vídeo</h2>
                 
-                <div class="video-container">
-                    <video id="videoPlayer" controls></video>
-                    <div id="videoPlaceholder" class="placeholder">
-                        <div class="icon">🎥</div>
-                        <p>Adicione cenas e gere a prévia</p>
+                <div class="video-box">
+                    <video id="player" controls style="width:100%; background:#000; border-radius:8px;"></video>
+                    <div id="placeholder" style="text-align:center; padding:40px; color:#666;">
+                        Adicione cenas e clique em Gerar
                     </div>
                 </div>
 
-                <div class="progress-box" id="progressBox" style="display:none;">
-                    <div class="progress-text" id="progressText">Gerando...</div>
-                    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+                <div id="progresso" style="display:none; margin:15px 0;">
+                    <div style="background:#333; height:10px; border-radius:5px; overflow:hidden;">
+                        <div id="barraProgresso" style="background:#8a60ff; height:100%; width:0%; transition:width 0.3s;"></div>
+                    </div>
+                    <small id="textoProgresso" style="color:#aaa;">Processando...</small>
                 </div>
 
-                <div class="actions-bar">
-                    <button class="btn btn-success" onclick="GeradorVideo.generate()" id="btnGenerate">
-                        ▶️ Gerar Vídeo (Grátis)
-                    </button>
-                    <button class="btn btn-secondary" onclick="GeradorVideo.download()" id="btnDownload" disabled>
-                        💾 Baixar MP4
-                    </button>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button class="btn btn-success" onclick="GeradorVideo.gerarVideo()" id="btnGerar">▶️ Gerar Vídeo (Grátis)</button>
+                    <button class="btn btn-secondary" onclick="GeradorVideo.baixar()" id="btnBaixar" disabled>💾 Baixar MP4</button>
                 </div>
 
-                <h3 style="margin-top:20px; color:#8a60ff;">📋 Suas Cenas</h3>
-                <div class="scene-list" id="sceneList">
-                    <p class="empty-msg">Nenhuma cena ainda</p>
+                <h3 style="margin-top:25px; color:#8a60ff;">📋 Cenas na Fila</h3>
+                <div id="listaCenas" style="max-height:200px; overflow-y:auto; margin-top:10px;">
+                    <p style="color:#666; font-size:0.9em;">Nenhuma cena adicionada.</p>
                 </div>
             </div>
         </div>
 
-        <!-- CUSTO -->
-        <div class="cost-panel">
-            <h2>💰 Versão Profissional</h2>
-            <p>Prévia acima é grátis. Veja o custo da versão final com voz real e qualidade 4K:</p>
-            
-            <div class="cost-grid">
-                <div class="cost-item"><span>🎙️ Locução</span><strong id="costTTS">R$ 0,00</strong></div>
-                <div class="cost-item"><span>🎵 Música</span><strong id="costMusic">R
+        <!-- RODAPÉ DE CUSTO -->
+        <div class="painel-custo">
+            <h3>💰 Versão Profissional (Paga)</h3>
+            <p>A prévia acima é grátis. Para ter voz real (TTS) e qualidade 4K, o custo estimado é:</p>
+            <div style="font-size:2em; color:#00e676; font-weight:bold;" id="custoTotal">R$ 0,00</div>
+            <button class="btn btn-warning" onclick="GeradorVideo.solicitarProducao()" style="margin-top:10px;">🚀 Contratar Versão Final</button>
+        </div>
+    </div>
+
+    <!-- Carrega lógica JS da pasta assets -->
+    <script src="/assets/js/estudio_prototipagem.js"></script>
+</body>
+</html>
