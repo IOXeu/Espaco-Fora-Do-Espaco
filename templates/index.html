@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sala VIP & Automação de Áudio</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        textarea, select, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background-color: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 120px;
+        }
+
+        textarea:focus, select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:disabled {
+            background-color: var(--border);
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #0f172a;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            text-align: center;
+            display: none;
+        }
+
+        .result-box audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🎙️ Sala VIP - Gerador de Locução</h1>
+        
+        <div class="form-group">
+            <label for="texto">Texto para Locução:</label>
+            <textarea id="texto" placeholder="Digite seu texto aqui... As expressões do dicionário regional serão aplicadas automaticamente."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="projeto">Nome do Projeto:</label>
+            <input type="text" id="projeto" value="anuncio_vip" placeholder="Ex: promocao_natal">
+        </div>
+
+        <div class="form-group">
+            <label for="voz">Escolha a Voz:</label>
+            <select id="voz">
+                <option value="francisca">Francisca (Feminina / Alegre)</option>
+                <option value="thalita">Thalita (Feminina / Dinâmica)</option>
+                <option value="antonio">Antonio (Masculino / Profissional)</option>
+                <option value="humberto">Humberto (Masculino / Promocional)</option>
+            </select>
+        </div>
+
+        <button id="btnGerar" onclick="gerarAudio()">Gerar Áudio Local (Free)</button>
+
+        <div id="loading" class="loading">⏳ Processando áudio e aplicando pipeline... Aguarde.</div>
+
+        <div id="resultBox" class="result-box">
+            <p>✅ Áudio gerado com sucesso!</p>
+            <audio id="audioPlayer" controls></audio>
+        </div>
+    </div>
+
+    <script>
+        async function gerarAudio() {
+            const texto = document.getElementById("texto").value.trim();
+            const projeto = document.getElementById("projeto").value.trim() || "anuncio_vip";
+            const voz = document.getElementById("voz").value;
+            const btnGerar = document.getElementById("btnGerar");
+            const loading = document.getElementById("loading");
+            const resultBox = document.getElementById("resultBox");
+            const audioPlayer = document.getElementById("audioPlayer");
+
+            if (!texto) {
+                alert("Por favor, digite algum texto para gerar a locução.");
+                return;
+            }
+
+            btnGerar.disabled = true;
+            loading.style.display = "block";
+            resultBox.style.display = "none";
+
+            try {
+                const response = await fetch("/api/gerar-audio", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ texto, projeto, voz })
+                });
+
+                const data = await response.json();
+
+                if (data.sucesso) {
+                    audioPlayer.src = data.arquivo_url;
+                    resultBox.style.display = "block";
+                } else {
+                    alert("Erro: " + (data.erro || "Desconhecido"));
+                }
+            } catch (err) {
+                alert("Erro de conexão com o servidor: " + err);
+            } finally {
+                btnGerar.disabled = false;
+                loading.style.display = "none";
+            }
+        }
+    </script>
+
+</body>
+</html>
