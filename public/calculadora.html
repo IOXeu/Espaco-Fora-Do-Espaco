@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora de Produção — Espaço Fora do Espaço</title>
+  <style>
+    :root{color-scheme:dark;--bg:#080b14;--panel:#111827;--line:#293246;--text:#f5f7fb;--muted:#9ba8bb;--mint:#8ff0c5;--red:#ff8585}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#172239,var(--bg) 55%);color:var(--text);font:15px/1.55 Inter,system-ui,sans-serif;padding:30px 16px}
+    main{max-width:880px;margin:auto}.tag{color:var(--mint);font-size:12px;text-transform:uppercase;letter-spacing:.14em}h1{font-size:clamp(28px,5vw,42px);line-height:1.12;margin:8px 0}p{color:var(--muted)}.card{background:rgba(17,24,39,.94);border:1px solid var(--line);border-radius:18px;padding:22px;margin:18px 0;box-shadow:0 18px 55px #0004}
+    label{display:block;color:var(--muted);font-size:13px;margin:13px 0 6px}select,textarea,input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:10px;background:#080d18;color:var(--text);font:inherit}textarea{min-height:135px;resize:vertical}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}button,.btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 17px;background:var(--mint);color:#062016;border:0;border-radius:10px;font-weight:800;text-decoration:none;cursor:pointer;margin-top:16px}button:disabled{opacity:.55;cursor:wait}.secondary{background:#253149;color:var(--text)}.quote{display:grid;grid-template-columns:1fr auto;gap:8px;border-bottom:1px solid var(--line);padding:9px 0}.total{color:var(--mint);font-size:24px;font-weight:800}.hint{font-size:13px}.alert{padding:12px;border-radius:10px;background:#1d2838;color:var(--text);margin-top:12px}.error{color:var(--red)}.hidden{display:none!important}
+  </style>
+</head>
+<body><main>
+  <div class="tag">Sandbox → Produção</div>
+  <h1>Quanto custa transformar seu projeto em produção?</h1>
+  <p>Teste e refine gratuitamente na sandbox. Quando estiver pronto, confira a estimativa e siga para o checkout. A geração paga só é iniciada após a confirmação do pagamento.</p>
+  <section class="card">
+    <div class="grid">
+      <div><label for="modelo">Modelo / serviço</label><select id="modelo">
+        <optgroup label="Voz e TTS">
+          <option value="grok-tts">Grok TTS — R$ 0,12 / bloco</option><option value="elevenlabs-flash">ElevenLabs Flash v2.5 — R$ 0,75 / 1.000 caracteres</option><option value="elevenlabs-turbo">ElevenLabs Turbo v2.5 — R$ 1,40 / 1.000 caracteres</option><option value="elevenlabs-v3">ElevenLabs v3 — R$ 2,30 / 1.000 caracteres</option><option value="elevenlabs-music">ElevenLabs Music v2 — R$ 2,50 / faixa</option>
+        </optgroup>
+        <optgroup label="Imagem"><option value="bria-generate">Bria FIBO Generate — R$ 1,90 / imagem</option><option value="bria-edit">Bria FIBO Edit — R$ 1,90 / imagem</option><option value="krea-3">Krea 3 — R$ 1,90 / imagem</option></optgroup>
+        <optgroup label="Vídeo — Pruna"><option value="pruna-video-draft">P-Video Draft 720p — R$ 0,10 / segundo</option><option value="pruna-video-padrao">P-Video 720p — R$ 0,40 / segundo</option><option value="pruna-video-alta">P-Video 1080p — R$ 0,75 / segundo</option><option value="pruna-animate">P-Video Animate — R$ 0,40 / segundo</option><option value="pruna-avatar-720p">P-Video Avatar 720p — R$ 0,25 / segundo</option><option value="pruna-avatar-1080p">P-Video Avatar 1080p — R$ 0,45 / segundo</option></optgroup>
+        <optgroup label="Vídeo — MiniMax H3 Max"><option value="minimax-480p">H3 Max 480P — R$ 0,50 / segundo</option><option value="minimax-768p">H3 Max 768P — R$ 0,75 / segundo</option></optgroup>
+      </select></div>
+      <div><label for="duracao">Duração em segundos (quando aplicável)</label><input id="duracao" type="number" min="1" max="120" value="10"></div>
+      <div><label for="quantidade">Imagens/faixas (quando aplicável)</label><input id="quantidade" type="number" min="1" max="10" value="1"></div>
+    </div>
+    <label for="prompt">Prompt ou texto</label><textarea id="prompt" maxlength="5000" placeholder="Cole o roteiro ou prompt final revisado na sandbox..."></textarea>
+    <div class="grid">
+      <div><label for="resolucao">Resolução do vídeo</label><select id="resolucao"><option value="480P">480P</option><option value="768P" selected>768P</option><option value="1080p">1080p (Pruna)</option></select></div>
+      <div><label for="blocos">Blocos Grok TTS</label><input id="blocos" type="number" min="1" max="10" value="1"></div>
+    </div>
+    <p class="hint">Os preços exibidos são os valores de venda definidos pelo portal, não uma cotação em tempo real do custo cobrado pelos provedores. O orçamento é recalculado no servidor antes do checkout.</p>
+    <button id="quoteBtn" class="secondary">Calcular orçamento</button>
+    <div id="quote" class="card hidden" aria-live="polite"></div>
+    <button id="checkoutBtn" class="hidden">Ir ao pagamento — geração ainda não iniciada</button>
+    <div id="message" class="alert hidden" aria-live="polite"></div>
+  </section>
+  <section id="orderCard" class="card hidden" aria-live="polite"><h2>Pedido de produção</h2><div id="orderStatus"></div><div id="orderResult"></div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id);let latestQuote=null;
+function currentPayload(){return {modelo:$('modelo').value,prompt:$('prompt').value.trim(),params:{duracao:Number($('duracao').value)||10,quantidade:Number($('quantidade').value)||1,blocos:Number($('blocos').value)||1,resolution:$('resolucao').value}}}
+function msg(text,error=false){$('message').textContent=text;$('message').classList.remove('hidden');$('message').classList.toggle('error',error)}
+function toggleInputs(){const m=$('modelo').value;$('duracao').disabled=!m.startsWith('pruna-')&&!m.startsWith('minimax-');$('quantidade').disabled=!['bria-generate','bria-edit','krea-3','elevenlabs-music'].includes(m);$('resolucao').disabled=!m.startsWith('minimax-')&&!m.startsWith('pruna-');$('blocos').disabled=m!=='grok-tts'}
+async function calculate(){const payload=currentPayload();if(!payload.prompt){msg('Informe o prompt/texto para calcular.',true);return}const btn=$('quoteBtn');btn.disabled=true;msg('Consultando a cotação autoritativa do servidor...');try{const res=await fetch('/api/orcamento',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await res.json();if(!res.ok)throw new Error(data.error||'Falha ao calcular');latestQuote={payload,...data.cotacao};renderQuote(latestQuote);$('checkoutBtn').classList.remove('hidden');$('message').classList.add('hidden')}catch(e){latestQuote=null;$('quote').classList.add('hidden');$('checkoutBtn').classList.add('hidden');msg(e.message,true)}finally{btn.disabled=false}}
+function renderQuote(q){const rows=[['Serviço',q.descricao],['Provedor/modelo',q.provedor],['Quantidade cobrada',`${q.quantidade} ${q.unidade}`],['Preço unitário',`R$ ${Number(q.preco_unitario).toFixed(2).replace('.',',')} / ${q.unidade}`],['Caracteres do texto',q.caracteres_prompt],['Subtotal',`R$ ${Number(q.subtotal).toFixed(2).replace('.',',')}`]];$('quote').replaceChildren();for(const [k,v] of rows){const r=document.createElement('div');r.className='quote';const a=document.createElement('span');a.textContent=k;const b=document.createElement('strong');b.textContent=v;r.append(a,b);$('quote').append(r)}const total=document.createElement('div');total.className='quote total';const a=document.createElement('span');a.textContent='Total estimado';const b=document.createElement('strong');b.textContent=`R$ ${Number(q.total).toFixed(2).replace('.',',')}`;total.append(a,b);$('quote').append(total);if(q.observacao){const note=document.createElement('p');note.className='hint';note.textContent=q.observacao;$('quote').append(note)}$('quote').classList.remove('hidden')}
+async function checkout(){if(!latestQuote){msg('Calcule o orçamento novamente antes de pagar.',true);return}const session=localStorage.getItem('espaco_sessao')||'';if(!session){msg('Desbloqueie sua Sala VIP e tente novamente. A sessão é exigida pelo Worker.',true);return}const btn=$('checkoutBtn');btn.disabled=true;try{const res=await fetch('/api/paid/checkout',{method:'POST',headers:{'Content-Type':'application/json','X-Sessao':session},body:JSON.stringify(latestQuote.payload)});const data=await res.json();if(!res.ok)throw new Error(data.error||'Não foi possível abrir o checkout.');const url=data.checkout_url||data.sandbox_checkout_url;if(!url)throw new Error('O Mercado Pago não retornou uma URL de checkout.');location.assign(url)}catch(e){msg(e.message,true);btn.disabled=false}}
+async function checkOrder(orderId){$('orderCard').classList.remove('hidden');$('orderStatus').textContent='Verificando pagamento e estado da produção...';try{const r=await fetch(`/api/paid/status?order_id=${encodeURIComponent(orderId)}`);const d=await r.json();if(!r.ok)throw new Error(d.error||'Falha ao consultar pedido');const p=d.pedido;$('orderStatus').textContent=`Status: ${p.status} · Valor: R$ ${Number(p.valor).toFixed(2).replace('.',',')}`;if(p.error_message)$('orderResult').textContent=p.error_message;if(d.resultado){const pre=document.createElement('pre');pre.style.whiteSpace='pre-wrap';pre.style.overflowWrap='anywhere';pre.textContent=JSON.stringify(d.resultado,null,2);$('orderResult').replaceChildren(pre)}if(['pending','creating_checkout','processing','submitted'].includes(p.status))setTimeout(()=>checkOrder(orderId),5000)}catch(e){$('orderStatus').textContent=e.message}}
+$('quoteBtn').addEventListener('click',calculate);$('checkoutBtn').addEventListener('click',checkout);$('modelo').addEventListener('change',()=>{latestQuote=null;$('quote').classList.add('hidden');$('checkoutBtn').classList.add('hidden');toggleInputs()});['prompt','duracao','quantidade','resolucao','blocos'].forEach(id=>$(id).addEventListener('input',()=>{latestQuote=null;$('checkoutBtn').classList.add('hidden')}));toggleInputs();const qs=new URLSearchParams(location.search);if(qs.get('order_id'))checkOrder(qs.get('order_id'));if(qs.get('payment'))msg(`Retorno do checkout: ${qs.get('payment')}. A geração só inicia quando o webhook confirma pagamento aprovado.`)
+</script></body></html>

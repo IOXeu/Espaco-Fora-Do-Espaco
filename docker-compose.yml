@@ -1,0 +1,27 @@
+services:
+  audio-sandbox:
+    build: .
+    container_name: espaco-audio-sandbox
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: "8000"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-http://localhost:8000}"
+      MAX_AUDIO_TEXT_CHARS: "8000"
+      AUDIO_OUTPUT_DIR: /data/audios_prontos
+      AUDIO_TEMP_DIR: /tmp/audio
+      AUDIO_BEATS_DIR: /data/beats
+    volumes:
+      - audio-output:/data/audios_prontos
+      - ./beats:/data/beats:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=256m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
+volumes:
+  audio-output:

@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "include": ["/mp/*", "/gerar-chave", "/validar-uso", "/api/*"],
+  "exclude": []
+}
