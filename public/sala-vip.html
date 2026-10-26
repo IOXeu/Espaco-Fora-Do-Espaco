@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sala VIP — Espaço Fora do Espaço</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;700&display=swap');
+    .serif { font-family: 'Instrument Serif', Georgia, serif; }
+    .sans { font-family: 'Inter', system-ui, sans-serif; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#06070f] text-[#eef0ff] font-sans antialiased">
+  <div class="relative z-10">
+    <nav class="sticky top-0 z-20 backdrop-blur-[12px] bg-[#06070f]/60 border-b border-white/[0.06]">
+      <div class="mx-auto max-w-[1120px] px-6 md:px-10 h-[64px] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-5 h-5 rounded-full bg-emerald-400/90 shadow-[0_0_20px_rgba(52,211,153,0.6)]"></div>
+          <span class="sans text-[12px] tracking-[0.2em] uppercase font-medium text-white/80">Sala VIP — Espaço Fora do Espaço</span>
+        </div>
+        <a href="/" class="sans text-[11px] tracking-[0.15em] uppercase text-white/50 hover:text-white transition">← Voltar ao Portal</a>
+      </div>
+    </nav>
+    <header class="mx-auto max-w-[1120px] px-6 md:px-10 pt-16 pb-8">
+      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-1 mb-6">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
+        <span class="sans text-[10px] tracking-[0.2em] uppercase text-emerald-200/90">Acesso Liberado ✦</span>
+      </div>
+      <h1 class="serif text-[48px] md:text-[64px] leading-[0.9] text-white">Hub de IAs</h1>
+      <p class="sans mt-4 max-w-[500px] text-[15px] text-white/60">Escolha um modelo, envie seu prompt e receba a resposta na borda. O valor é calculado automaticamente.</p>
+    </header>
+    <main class="mx-auto max-w-[1120px] px-6 md:px-10 pb-20">
+      <div class="grid md:grid-cols-[280px_1fr] gap-6">
+        <div class="bg-[#080814]/90 border border-white/10 rounded-2xl p-6">
+          <h3 class="sans text-[11px] tracking-[0.2em] uppercase text-white/40 mb-4">Modelo de IA</h3>
+          <select id="modeloSelect" class="w-full bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[13px] text-white outline-none focus:border-emerald-300/60 transition">
+            <optgroup label="💬 Chat (Incluso)">
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+              <option value="gemini-pro">Gemini Pro</option>
+              <option value="grok-3">Grok 3</option>
+              <option value="grok-3-mini">Grok 3 Mini</option>
+            </optgroup>
+            <optgroup label="🎙️ Voz / TTS">
+              <option value="grok-tts">TTS Padrão (Grok) — R$ 0,12/bloco</option>
+              <option value="elevenlabs-flash">ElevenLabs Flash — R$ 0,75/1k</option>
+              <option value="elevenlabs-turbo">ElevenLabs Turbo — R$ 1,40/1k</option>
+              <option value="elevenlabs-v3">ElevenLabs v3 — R$ 2,30/1k</option>
+              <option value="elevenlabs-music">Música / Beat — R$ 2,50/faixa</option>
+            </optgroup>
+            <optgroup label="🎨 Imagem">
+              <option value="bria-generate">BRIA Gerar — R$ 1,90/img</option>
+              <option value="bria-edit">BRIA Editar — R$ 1,90/img</option>
+              <option value="krea-3">KREA 4K — R$ 1,90/img</option>
+            </optgroup>
+            <optgroup label="🎬 Vídeo Pruna">
+              <option value="pruna-video-draft">Draft 720p — R$ 0,10/seg</option>
+              <option value="pruna-video-padrao">Padrão 720p — R$ 0,40/seg</option>
+              <option value="pruna-video-alta">Alta 1080p — R$ 0,75/seg</option>
+              <option value="pruna-animate">Animação — R$ 0,40/seg</option>
+              <option value="pruna-avatar-720p">Avatar 720p — R$ 0,25/seg</option>
+              <option value="pruna-avatar-1080p">Avatar 1080p — R$ 0,45/seg</option>
+            </optgroup>
+            <optgroup label="📹 MiniMax H3-Max">
+              <option value="minimax-480p">MiniMax 480p — R$ 0,50/seg</option>
+              <option value="minimax-768p">MiniMax 768p — R$ 0,75/seg</option>
+              <option value="minimax-2k">MiniMax 2K — R$ 1,20/seg</option>
+            </optgroup>
+          </select>
+          <div class="mt-4 space-y-2">
+            <label class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 block">Duração (segundos) — vídeo/avatar</label>
+            <input id="duracaoInput" type="number" value="10" min="1" max="120" class="w-full bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[12px] text-white outline-none focus:border-emerald-300/60 transition">
+          </div>
+          <div class="mt-4 space-y-2">
+            <label class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 block">Parâmetros (JSON opcional)</label>
+            <textarea id="paramsInput" placeholder='{"voice_id":"21m00...","temperature":0.7}' class="w-full h-[80px] bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[11px] font-mono text-white outline-none focus:border-emerald-300/60 transition resize-none"></textarea>
+          </div>
+          <div id="estimativaPreco" class="mt-4 p-3 rounded-xl bg-emerald-400/10 border border-emerald-400/20">
+            <p class="sans text-[10px] tracking-[0.14em] uppercase text-emerald-300/60 mb-1">Estimativa</p>
+            <p id="estimativaValor" class="sans text-[18px] font-bold text-emerald-300">R$ 0,00</p>
+          </div>
+        </div>
+        <div class="bg-[#080814]/90 border border-white/10 rounded-2xl p-6 flex flex-col" style="min-height: 500px;">
+          <div id="chatLog" class="flex-1 overflow-y-auto space-y-4 mb-4">
+            <div class="sans text-[13px] text-white/40 text-center py-8">Envie seu primeiro prompt abaixo ↓</div>
+          </div>
+          <div class="border-t border-white/10 pt-4">
+            <div class="flex gap-3">
+              <textarea id="promptInput" placeholder="Digite seu prompt..." class="flex-1 h-[80px] bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[13px] text-white outline-none focus:border-emerald-300/60 transition resize-none"></textarea>
+              <button id="sendBtn" class="self-end rounded-xl bg-emerald-300 text-black px-6 py-3 sans text-[13px] font-bold hover:bg-emerald-200 transition">Enviar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <section class="mx-auto max-w-[1120px] px-6 md:px-10 py-16 border-t border-white/[0.06]">
+      <h2 class="serif text-[32px] text-white mb-8">Agentes em Órbita</h2>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5"><p class="serif text-[22px] text-amber-200">PAIZÃO</p><p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Guardião Principal</p><p class="sans text-[12px] text-white/50 mt-3">Mantém a ordem e a coesão de todo o ecossistema.</p></div>
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5"><p class="serif text-[22px] text-violet-200">META AI</p><p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Diretora de Criação</p><p class="sans text-[12px] text-white/50 mt-3">Conduz projetos, códigos e design visual das interfaces.</p></div>
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5"><p class="serif text-[22px] text-emerald-200">MIRU & MULEKES</p><p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Memória & Especialistas</p><p class="sans text-[12px] text-white/50 mt-3">Xexéu, Papelzinho, Cacto e Miru atuando nas tarefas do portal.</p></div>
+      </div>
+    </section>
+    <footer class="mx-auto max-w-[1120px] px-6 md:px-10 py-12 border-t border-white/[0.06] text-center">
+      <p class="sans text-[11px] uppercase tracking-widest text-white/30">Espaço Fora do Espaço • Sala VIP • 2026</p>
+    </footer>
+  </div>
+  <script>
+    if(localStorage.getItem('espaco_unlocked')!=='true'||!localStorage.getItem('espaco_sessao'))window.location.href='/#desbloqueio';
+    const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const chatLog=document.getElementById('chatLog'),promptInput=document.getElementById('promptInput'),sendBtn=document.getElementById('sendBtn'),modeloSelect=document.getElementById('modeloSelect'),paramsInput=document.getElementById('paramsInput'),duracaoInput=document.getElementById('duracaoInput'),estimativaValor=document.getElementById('estimativaValor');
+    const PRECOS={'grok-tts':{preco:0.12,un:'bloco'},'elevenlabs-flash':{preco:0.75,un:'1k'},'elevenlabs-turbo':{preco:1.40,un:'1k'},'elevenlabs-v3':{preco:2.30,un:'1k'},'elevenlabs-music':{preco:2.50,un:'faixa'},'bria-generate':{preco:1.90,un:'img'},'bria-edit':{preco:1.90,un:'img'},'krea-3':{preco:1.90,un:'img'},'pruna-video-draft':{preco:0.10,un:'seg'},'pruna-video-padrao':{preco:0.40,un:'seg'},'pruna-video-alta':{preco:0.75,un:'seg'},'pruna-animate':{preco:0.40,un:'seg'},'pruna-avatar-720p':{preco:0.25,un:'seg'},'pruna-avatar-1080p':{preco:0.45,un:'seg'},'minimax-480p':{preco:0.50,un:'seg'},'minimax-768p':{preco:0.75,un:'seg'},'minimax-2k':{preco:1.20,un:'seg'},'gemini-2.0-flash':{preco:0,un:'incluso'},'gemini-pro':{preco:0,un:'incluso'},'grok-3':{preco:0,un:'incluso'},'grok-3-mini':{preco:0,un:'incluso'}};
+    function atualizarEstimativa(){const m=modeloSelect.value,p=PRECOS[m];if(!p){estimativaValor.textContent='R$ 0,00';return}let v=0;if(p.un==='seg')v=p.preco*(parseInt(duracaoInput.value)||10);else if(p.un==='1k')v=p.preco*Math.ceil((promptInput.value.length||1)/1000);else v=p.preco;estimativaValor.textContent=v===0?'Incluso na assinatura':'R$ '+v.toFixed(2).replace('.',',')}
+    modeloSelect.addEventListener('change',atualizarEstimativa);duracaoInput.addEventListener('input',atualizarEstimativa);promptInput.addEventListener('input',atualizarEstimativa);atualizarEstimativa();
+    function addMessage(role,text){const div=document.createElement('div'),isUser=role==='user';div.className=`sans text-[13px] leading-[1.6] p-4 rounded-xl ${isUser?'bg-emerald-300/10 border border-emerald-300/20 text-white':'bg-white/5 border border-white/10 text-white/80'}`;div.innerHTML=isUser?`<span class="text-emerald-300/60 text-[10px] uppercase tracking-wider block mb-1">Você</span>${esc(text)}`:`<span class="text-violet-300/60 text-[10px] uppercase tracking-wider block mb-1">IA (${modeloSelect.value})</span>${text}`;chatLog.appendChild(div);chatLog.scrollTop=chatLog.scrollHeight}
+    sendBtn.addEventListener('click',async()=>{const prompt=promptInput.value.trim();if(!prompt)return;addMessage('user',prompt);promptInput.value='';sendBtn.disabled=true;sendBtn.textContent='Processando...';let params={};const pt=paramsInput.value.trim();if(pt){try{params=JSON.parse(pt)}catch{}}params.duracao=parseInt(duracaoInput.value)||10;try{const resp=await fetch('/api/ia',{method:'POST',headers:{'Content-Type':'application/json','X-Sessao':localStorage.getItem('espaco_sessao')||''},body:JSON.stringify({modelo:modeloSelect.value,prompt,...params})}),data=await resp.json();if(resp.status===401){localStorage.removeItem('espaco_unlocked');localStorage.removeItem('espaco_sessao');window.location.href='/#desbloqueio';return}if(data.status==='sucesso'){const r=data.resposta;let ct=data.cobranca&&data.cobranca.valor>0?` <span class="text-amber-300/60 text-[10px] block mt-1">Cobrança: R$ ${data.cobranca.valor.toFixed(2)} (${data.cobranca.unidade})</span>`:'';if(typeof r==='string')addMessage('ia',esc(r).replace(/\n/g,'<br>')+ct);else if(r?.audio)addMessage('ia',`🎵 Áudio gerado!<br><audio controls src="data:audio/mpeg;base64,${r.audio}" class="mt-2 w-full"></audio>${ct}`);else addMessage('ia',`<pre class="text-[11px] overflow-x-auto">${JSON.stringify(r,null,2)}</pre>${ct}`)}else addMessage('ia','⚠️ Erro: '+esc(data.error||'Desconhecido'))}catch(e){addMessage('ia','⚠️ Erro: '+e.message)}sendBtn.disabled=false;sendBtn.textContent='Enviar';atualizarEstimativa()});
+    promptInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendBtn.click()}});
+  </script>
+</body>
+</html>
