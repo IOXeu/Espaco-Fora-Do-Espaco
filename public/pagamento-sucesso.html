@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pagamento Confirmado — Espaço Fora do Espaço</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;700&display=swap');
+    .serif { font-family: 'Instrument Serif', Georgia, serif; }
+    .sans { font-family: 'Inter', system-ui, sans-serif; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#06070f] text-[#eef0ff] font-sans antialiased flex items-center justify-center">
+  <div class="max-w-[500px] w-full mx-6 bg-[#080814]/90 border border-white/10 rounded-[28px] p-8 md:p-10 text-center">
+    <div class="w-16 h-16 mx-auto rounded-full bg-emerald-400/20 border border-emerald-400/40 flex items-center justify-center mb-6">
+      <span class="text-emerald-300 text-3xl">✓</span>
+    </div>
+    <h1 class="serif text-[32px] text-white mb-3">Pagamento Confirmado!</h1>
+    <p class="sans text-[14px] text-white/60 mb-8">Sua assinatura está ativa. Aqui está seu código de acesso exclusivo:</p>
+    <div id="loadingCode" class="sans text-[13px] text-white/40 mb-6">Gerando sua chave criptográfica...</div>
+    <div id="codeBox" class="hidden">
+      <div class="bg-[#06070f] border border-emerald-300/30 rounded-xl p-4 mb-6">
+        <p id="codigoAcesso" class="sans text-[11px] font-mono text-emerald-300 break-all"></p>
+      </div>
+      <button onclick="copyCode()" class="sans text-[12px] text-amber-200/80 hover:text-amber-100 transition">📋 Copiar código</button>
+    </div>
+    <div id="errorBox" class="hidden">
+      <p class="sans text-[13px] text-rose-300 mb-6">Não foi possível gerar sua chave automaticamente. Entre em contato.</p>
+    </div>
+    <a href="/" class="block sans text-[12px] text-white/50 hover:text-white transition mt-6">← Voltar ao portal</a>
+  </div>
+  <script>
+    async function gerarChave() {
+      const params = new URLSearchParams(window.location.search);
+      const paymentId = params.get('payment_id') || params.get('preference_id');
+      if (!paymentId) {
+        document.getElementById('loadingCode').textContent = 'Pagamento não identificado na URL.';
+        document.getElementById('errorBox').classList.remove('hidden');
+        return;
+      }
+      try {
+        const resp = await fetch('/gerar-chave', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payment_id: paymentId }),
+        });
+        const data = await resp.json();
+        if (data.success) {
+          document.getElementById('loadingCode').classList.add('hidden');
+          document.getElementById('codeBox').classList.remove('hidden');
+          document.getElementById('codigoAcesso').textContent = data.codigo_acesso;
+        } else {
+          document.getElementById('loadingCode').classList.add('hidden');
+          document.getElementById('errorBox').classList.remove('hidden');
+        }
+      } catch (err) {
+        document.getElementById('loadingCode').classList.add('hidden');
+        document.getElementById('errorBox').classList.remove('hidden');
+      }
+    }
+    function copyCode() {
+      const code = document.getElementById('codigoAcesso').textContent;
+      navigator.clipboard.writeText(code);
+      alert('Código copiado! Cole na página de desbloqueio.');
+    }
+    gerarChave();
+  </script>
+</body>
+</html>
