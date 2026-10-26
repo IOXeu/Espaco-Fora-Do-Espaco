@@ -1,122 +1,599 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sala VIP — Espaço Fora do Espaço</title>
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;700&display=swap');
-    .serif { font-family: 'Instrument Serif', Georgia, serif; }
-    .sans { font-family: 'Inter', system-ui, sans-serif; }
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sala VIP — Espaço Fora do Espaço</title>
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#080b14;--bg2:#0f172a;--panel:rgba(17,24,39,.94);--line:#293246;
+  --text:#f5f7fb;--muted:#9ba8bb;--mint:#8ff0c5;--blue:#38bdf8;
+  --red:#ff8585;--gold:#fbbf24;--roxo:#a78bfa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:radial-gradient(ellipse at top,#172239,var(--bg) 55%);
+  color:var(--text);font:15px/1.55 Inter,system-ui,sans-serif;
+  min-height:100vh;padding:24px 16px 48px;
+}
+main{max-width:860px;margin:auto}
+.tag{color:var(--mint);font-size:12px;text-transform:uppercase;letter-spacing:.14em}
+h1{font-size:clamp(26px,5vw,38px);line-height:1.12;margin:8px 0}
+.sub{color:var(--muted);margin-bottom:24px}
+.tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{
+  flex:1;min-width:120px;padding:14px 8px;border:1px solid var(--line);
+  border-radius:12px;background:var(--panel);color:var(--muted);
+  font:600 14px/1.3 inherit;text-align:center;cursor:pointer;
+  transition:.2s;border-bottom:3px solid transparent;
+}
+.tab:hover{color:var(--text);border-color:var(--blue)}
+.tab.ativa{color:var(--mint);border-bottom-color:var(--mint);background:rgba(15,107,92,.08)}
+.tab .ico{font-size:22px;display:block;margin-bottom:4px}
+.painel{display:none}
+.painel.ativo{display:block}
+.card{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:16px;padding:24px;margin-bottom:16px;
+  box-shadow:0 12px 40px #0003;
+}
+label{display:block;color:var(--muted);font-size:13px;margin:14px 0 6px}
+input,select,textarea{
+  width:100%;padding:12px 14px;border:1px solid var(--line);
+  border-radius:10px;background:#080d18;color:var(--text);
+  font:inherit;transition:.15s;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);outline:none}
+textarea{min-height:100px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+.girias-box{margin:10px 0}
+.girias-box label{margin-bottom:8px}
+.regiao-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.regiao-tab{
+  padding:6px 14px;border:1px solid var(--line);border-radius:20px;
+  background:transparent;color:var(--muted);font-size:13px;cursor:pointer;
+  transition:.15s;
+}
+.regiao-tab:hover{border-color:var(--blue);color:var(--text)}
+.regiao-tab.ativa{background:var(--blue);color:#000;border-color:var(--blue);font-weight:600}
+.giria-badge{
+  display:inline-block;padding:4px 12px;margin:3px;border-radius:16px;
+  background:#1a2332;border:1px solid var(--line);color:var(--muted);
+  font-size:13px;cursor:pointer;transition:.15s;user-select:none;
+}
+.giria-badge:hover{border-color:var(--mint);color:var(--mint)}
+.giria-badge.usada{background:rgba(143,240,197,.12);border-color:var(--mint);color:var(--mint)}
+btn,.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 22px;border:0;border-radius:10px;font:700 15px/1 inherit;
+  cursor:pointer;text-decoration:none;transition:.15s;
+}
+.btn-primaria{background:var(--mint);color:#062016}
+.btn-primaria:hover{filter:brightness(1.1)}
+.btn-primaria:disabled{opacity:.5;cursor:wait}
+.btn-secundaria{background:#253149;color:var(--text)}
+.btn-secundaria:hover{background:#2d3a56}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.btn-ghost:hover{color:var(--text);border-color:var(--blue)}
+.player-area{margin-top:16px;display:none}
+.player-area.ativo{display:block}
+audio,video{width:100%;border-radius:10px;margin-top:8px;outline:none}
+video{background:#000}
+img.preview-img{max-width:100%;border-radius:10px;margin-top:8px}
+.upsell{
+  margin-top:18px;padding:18px;border:1px solid var(--line);
+  border-radius:12px;background:linear-gradient(135deg,rgba(15,107,92,.06),rgba(56,189,248,.04));
+  display:none;
+}
+.upsell.ativo{display:block}
+.upsell-titulo{color:var(--mint);font-weight:700;font-size:15px;margin-bottom:8px}
+.upsell-lista{color:var(--muted);font-size:14px;margin:8px 0 14px;list-style:none}
+.upsell-lista li{padding:3px 0}
+.upsell-lista li::before{content:"✓ ";color:var(--mint)}
+.drop{
+  border:2px dashed var(--line);border-radius:10px;padding:20px;
+  text-align:center;color:var(--muted);cursor:pointer;transition:.15s;
+}
+.drop:hover,.drop.sobre{border-color:var(--blue);background:rgba(56,189,248,.05)}
+.drop input{display:none}
+.arquivos-lista{margin-top:8px}
+.arq-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 10px;border:1px solid var(--line);border-radius:6px;
+  margin:4px 0;font-size:13px;
+}
+.arq-item button{background:none;border:none;color:var(--red);cursor:pointer;font-size:16px}
+.status{color:var(--muted);font-size:13px;min-height:20px;margin-top:10px}
+.status.erro{color:var(--red)}
+.status.ok{color:var(--mint)}
+.avancado-toggle{text-align:center;margin:24px 0}
+.avancado-box{display:none}
+.avancado-box.ativo{display:block}
+.avancado-box textarea{min-height:200px;font:13px/1.5 Consolas,monospace}
+footer{text-align:center;color:var(--muted);font-size:13px;margin-top:32px;padding-top:20px;border-top:1px solid var(--line)}
+footer a{color:var(--blue);text-decoration:none}
+footer a:hover{text-decoration:underline}
+.legenda-box{margin-top:14px;display:none}
+.legenda-box.ativo{display:block}
+.legenda-box textarea{min-height:80px;font:13px/1.5 Consolas,monospace}
+</style>
 </head>
-<body class="min-h-screen bg-[#06070f] text-[#eef0ff] font-sans antialiased">
-  <div class="relative z-10">
-    <nav class="sticky top-0 z-20 backdrop-blur-[12px] bg-[#06070f]/60 border-b border-white/[0.06]">
-      <div class="mx-auto max-w-[1120px] px-6 md:px-10 h-[64px] flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-5 h-5 rounded-full bg-emerald-400/90 shadow-[0_0_20px_rgba(52,211,153,0.6)]"></div>
-          <span class="sans text-[12px] tracking-[0.2em] uppercase font-medium text-white/80">Sala VIP — Espaço Fora do Espaço</span>
-        </div>
-        <a href="/" class="sans text-[11px] tracking-[0.15em] uppercase text-white/50 hover:text-white transition">← Voltar ao Portal</a>
-      </div>
-    </nav>
-    <header class="mx-auto max-w-[1120px] px-6 md:px-10 pt-16 pb-8">
-      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/[0.08] px-3 py-1 mb-6">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></span>
-        <span class="sans text-[10px] tracking-[0.2em] uppercase text-emerald-200/90">Acesso Liberado ✦</span>
-      </div>
-      <h1 class="serif text-[48px] md:text-[64px] leading-[0.9] text-white">Hub de IAs</h1>
-      <p class="sans mt-4 max-w-[500px] text-[15px] text-white/60">Escolha um modelo, envie seu prompt e receba a resposta na borda. O valor é calculado automaticamente.</p>
-    </header>
-    <main class="mx-auto max-w-[1120px] px-6 md:px-10 pb-20">
-      <div class="grid md:grid-cols-[280px_1fr] gap-6">
-        <div class="bg-[#080814]/90 border border-white/10 rounded-2xl p-6">
-          <h3 class="sans text-[11px] tracking-[0.2em] uppercase text-white/40 mb-4">Modelo de IA</h3>
-          <select id="modeloSelect" class="w-full bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[13px] text-white outline-none focus:border-emerald-300/60 transition">
-            <optgroup label="💬 Chat (Incluso)">
-              <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
-              <option value="gemini-pro">Gemini Pro</option>
-              <option value="grok-3">Grok 3</option>
-              <option value="grok-3-mini">Grok 3 Mini</option>
-            </optgroup>
-            <optgroup label="🎙️ Voz / TTS">
-              <option value="grok-tts">TTS Padrão (Grok) — R$ 0,12/bloco</option>
-              <option value="elevenlabs-flash">ElevenLabs Flash — R$ 0,75/1k</option>
-              <option value="elevenlabs-turbo">ElevenLabs Turbo — R$ 1,40/1k</option>
-              <option value="elevenlabs-v3">ElevenLabs v3 — R$ 2,30/1k</option>
-              <option value="elevenlabs-music">Música / Beat — R$ 2,50/faixa</option>
-            </optgroup>
-            <optgroup label="🎨 Imagem">
-              <option value="bria-generate">BRIA Gerar — R$ 1,90/img</option>
-              <option value="bria-edit">BRIA Editar — R$ 1,90/img</option>
-              <option value="krea-3">KREA 4K — R$ 1,90/img</option>
-            </optgroup>
-            <optgroup label="🎬 Vídeo Pruna">
-              <option value="pruna-video-draft">Draft 720p — R$ 0,10/seg</option>
-              <option value="pruna-video-padrao">Padrão 720p — R$ 0,40/seg</option>
-              <option value="pruna-video-alta">Alta 1080p — R$ 0,75/seg</option>
-              <option value="pruna-animate">Animação — R$ 0,40/seg</option>
-              <option value="pruna-avatar-720p">Avatar 720p — R$ 0,25/seg</option>
-              <option value="pruna-avatar-1080p">Avatar 1080p — R$ 0,45/seg</option>
-            </optgroup>
-            <optgroup label="📹 MiniMax H3-Max">
-              <option value="minimax-480p">MiniMax 480p — R$ 0,50/seg</option>
-              <option value="minimax-768p">MiniMax 768p — R$ 0,75/seg</option>
-              <option value="minimax-2k">MiniMax 2K — R$ 1,20/seg</option>
-            </optgroup>
-          </select>
-          <div class="mt-4 space-y-2">
-            <label class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 block">Duração (segundos) — vídeo/avatar</label>
-            <input id="duracaoInput" type="number" value="10" min="1" max="120" class="w-full bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[12px] text-white outline-none focus:border-emerald-300/60 transition">
-          </div>
-          <div class="mt-4 space-y-2">
-            <label class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 block">Parâmetros (JSON opcional)</label>
-            <textarea id="paramsInput" placeholder='{"voice_id":"21m00...","temperature":0.7}' class="w-full h-[80px] bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[11px] font-mono text-white outline-none focus:border-emerald-300/60 transition resize-none"></textarea>
-          </div>
-          <div id="estimativaPreco" class="mt-4 p-3 rounded-xl bg-emerald-400/10 border border-emerald-400/20">
-            <p class="sans text-[10px] tracking-[0.14em] uppercase text-emerald-300/60 mb-1">Estimativa</p>
-            <p id="estimativaValor" class="sans text-[18px] font-bold text-emerald-300">R$ 0,00</p>
-          </div>
-        </div>
-        <div class="bg-[#080814]/90 border border-white/10 rounded-2xl p-6 flex flex-col" style="min-height: 500px;">
-          <div id="chatLog" class="flex-1 overflow-y-auto space-y-4 mb-4">
-            <div class="sans text-[13px] text-white/40 text-center py-8">Envie seu primeiro prompt abaixo ↓</div>
-          </div>
-          <div class="border-t border-white/10 pt-4">
-            <div class="flex gap-3">
-              <textarea id="promptInput" placeholder="Digite seu prompt..." class="flex-1 h-[80px] bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[13px] text-white outline-none focus:border-emerald-300/60 transition resize-none"></textarea>
-              <button id="sendBtn" class="self-end rounded-xl bg-emerald-300 text-black px-6 py-3 sans text-[13px] font-bold hover:bg-emerald-200 transition">Enviar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-    <section class="mx-auto max-w-[1120px] px-6 md:px-10 py-16 border-t border-white/[0.06]">
-      <h2 class="serif text-[32px] text-white mb-8">Agentes em Órbita</h2>
-      <div class="grid md:grid-cols-3 gap-4">
-        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5"><p class="serif text-[22px] text-amber-200">PAIZÃO</p><p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Guardião Principal</p><p class="sans text-[12px] text-white/50 mt-3">Mantém a ordem e a coesão de todo o ecossistema.</p></div>
-        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5"><p class="serif text-[22px] text-violet-200">META AI</p><p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Diretora de Criação</p><p class="sans text-[12px] text-white/50 mt-3">Conduz projetos, códigos e design visual das interfaces.</p></div>
-        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5"><p class="serif text-[22px] text-emerald-200">MIRU & MULEKES</p><p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Memória & Especialistas</p><p class="sans text-[12px] text-white/50 mt-3">Xexéu, Papelzinho, Cacto e Miru atuando nas tarefas do portal.</p></div>
-      </div>
-    </section>
-    <footer class="mx-auto max-w-[1120px] px-6 md:px-10 py-12 border-t border-white/[0.06] text-center">
-      <p class="sans text-[11px] uppercase tracking-widest text-white/30">Espaço Fora do Espaço • Sala VIP • 2026</p>
-    </footer>
+<body>
+<main>
+  <div class="tag">Sala VIP — Estúdio Gratuito</div>
+  <h1>Teste antes de produzir.</h1>
+  <p class="sub">Escreva, ouça, veja. Quando gostar, produza com qualidade premium.</p>
+
+  <div class="tabs">
+    <div class="tab ativa" data-tab="voz"><span class="ico">🎙️</span>Voz</div>
+    <div class="tab" data-tab="video"><span class="ico">🎬</span>Vídeo</div>
+    <div class="="tab" data-tab="musica"><span class="ico">🎵</span>Música</div>
+    <div class="tab" data-tab="imagem"><span class="ico">🖼️</span>Imagem</div>
   </div>
-  <script>
-    if(localStorage.getItem('espaco_unlocked')!=='true'||!localStorage.getItem('espaco_sessao'))window.location.href='/#desbloqueio';
-    const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-    const chatLog=document.getElementById('chatLog'),promptInput=document.getElementById('promptInput'),sendBtn=document.getElementById('sendBtn'),modeloSelect=document.getElementById('modeloSelect'),paramsInput=document.getElementById('paramsInput'),duracaoInput=document.getElementById('duracaoInput'),estimativaValor=document.getElementById('estimativaValor');
-    const PRECOS={'grok-tts':{preco:0.12,un:'bloco'},'elevenlabs-flash':{preco:0.75,un:'1k'},'elevenlabs-turbo':{preco:1.40,un:'1k'},'elevenlabs-v3':{preco:2.30,un:'1k'},'elevenlabs-music':{preco:2.50,un:'faixa'},'bria-generate':{preco:1.90,un:'img'},'bria-edit':{preco:1.90,un:'img'},'krea-3':{preco:1.90,un:'img'},'pruna-video-draft':{preco:0.10,un:'seg'},'pruna-video-padrao':{preco:0.40,un:'seg'},'pruna-video-alta':{preco:0.75,un:'seg'},'pruna-animate':{preco:0.40,un:'seg'},'pruna-avatar-720p':{preco:0.25,un:'seg'},'pruna-avatar-1080p':{preco:0.45,un:'seg'},'minimax-480p':{preco:0.50,un:'seg'},'minimax-768p':{preco:0.75,un:'seg'},'minimax-2k':{preco:1.20,un:'seg'},'gemini-2.0-flash':{preco:0,un:'incluso'},'gemini-pro':{preco:0,un:'incluso'},'grok-3':{preco:0,un:'incluso'},'grok-3-mini':{preco:0,un:'incluso'}};
-    function atualizarEstimativa(){const m=modeloSelect.value,p=PRECOS[m];if(!p){estimativaValor.textContent='R$ 0,00';return}let v=0;if(p.un==='seg')v=p.preco*(parseInt(duracaoInput.value)||10);else if(p.un==='1k')v=p.preco*Math.ceil((promptInput.value.length||1)/1000);else v=p.preco;estimativaValor.textContent=v===0?'Incluso na assinatura':'R$ '+v.toFixed(2).replace('.',',')}
-    modeloSelect.addEventListener('change',atualizarEstimativa);duracaoInput.addEventListener('input',atualizarEstimativa);promptInput.addEventListener('input',atualizarEstimativa);atualizarEstimativa();
-    function addMessage(role,text){const div=document.createElement('div'),isUser=role==='user';div.className=`sans text-[13px] leading-[1.6] p-4 rounded-xl ${isUser?'bg-emerald-300/10 border border-emerald-300/20 text-white':'bg-white/5 border border-white/10 text-white/80'}`;div.innerHTML=isUser?`<span class="text-emerald-300/60 text-[10px] uppercase tracking-wider block mb-1">Você</span>${esc(text)}`:`<span class="text-violet-300/60 text-[10px] uppercase tracking-wider block mb-1">IA (${modeloSelect.value})</span>${text}`;chatLog.appendChild(div);chatLog.scrollTop=chatLog.scrollHeight}
-    sendBtn.addEventListener('click',async()=>{const prompt=promptInput.value.trim();if(!prompt)return;addMessage('user',prompt);promptInput.value='';sendBtn.disabled=true;sendBtn.textContent='Processando...';let params={};const pt=paramsInput.value.trim();if(pt){try{params=JSON.parse(pt)}catch{}}params.duracao=parseInt(duracaoInput.value)||10;try{const resp=await fetch('/api/ia',{method:'POST',headers:{'Content-Type':'application/json','X-Sessao':localStorage.getItem('espaco_sessao')||''},body:JSON.stringify({modelo:modeloSelect.value,prompt,...params})}),data=await resp.json();if(resp.status===401){localStorage.removeItem('espaco_unlocked');localStorage.removeItem('espaco_sessao');window.location.href='/#desbloqueio';return}if(resp.status===402){addMessage('ia','Este modelo requer orçamento e pagamento antes da geração. <a href="/calculadora.html" class="text-emerald-300 underline">Abrir calculadora de produção</a>');sendBtn.disabled=false;sendBtn.textContent='Enviar';return}if(data.status==='sucesso'){const r=data.resposta;let ct=data.cobranca&&data.cobranca.valor>0?` <span class="text-amber-300/60 text-[10px] block mt-1">Cobrança: R$ ${data.cobranca.valor.toFixed(2)} (${data.cobranca.unidade})</span>`:'';if(typeof r==='string')addMessage('ia',esc(r).replace(/\n/g,'<br>')+ct);else if(r?.audio)addMessage('ia',`🎵 Áudio gerado!<br><audio controls src="data:audio/mpeg;base64,${r.audio}" class="mt-2 w-full"></audio>${ct}`);else addMessage('ia',`<pre class="text-[11px] overflow-x-auto">${JSON.stringify(r,null,2)}</pre>${ct}`)}else addMessage('ia','⚠️ Erro: '+esc(data.error||'Desconhecido'))}catch(e){addMessage('ia','⚠️ Erro: '+e.message)}sendBtn.disabled=false;sendBtn.textContent='Enviar';atualizarEstimativa()});
-    promptInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendBtn.click()}});
-  </script>
+
+  <!-- VOZ -->
+  <section class="painel ativo" id="p-voz">
+    <div class="card">
+      <div class="girias-box">
+        <label>Escolha o sotaque — clique nas gírias para usar</label>
+        <div class="regiao-tabs" id="reg-tabs">
+          <div class="regiao-tab ativa" data-reg="norte">Norte</div>
+          <div class="regiao-tab" data-reg="nordeste">Nordeste</div>
+          <div class="regiao-tab" data-reg="sudeste">Sudeste</div>
+          <div class="regiao-tab" data-reg="sul">Sul</div>
+        </div>
+        <div id="girias-badges"></div>
+      </div>
+      <label for="voz-texto">O que a voz vai dizer</label>
+      <textarea id="voz-texto" placeholder="Oxe, mano, esse produto é arretado de bom, visse!"></textarea>
+      <div class="grid2">
+        <div><label for="voz-voz">Quem fala</label>
+          <select id="voz-voz">
+            <option value="pt-BR-FranciscaNeural">Francisca (feminina)</option>
+            <option value="pt-BR-AntonioNeural">Antonio (masculino)</option>
+            <option value="pt-BR-ThalitaMultilingualNeural">Thalita (multilíngue)</option>
+          </select></div>
+        <div><label for="voz-vel">Velocidade</label>
+          <select id="voz-vel">
+            <option value="+0%">Normal</option>
+            <option value="-10%">Lenta</option>
+            <option value="+10%">Rápida</option>
+            <option value="+20%">Muito rápida</option>
+          </select></div>
+      </div>
+      <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-primaria" id="voz-btn">🎙️ Ouvir prévia</button>
+        <button class="btn btn-ghost" id="voz-legenda-btn">📝 Gerar legenda</button>
+      </div>
+      <div class="status" id="voz-status"></div>
+      <div class="player-area" id="voz-player"><audio id="voz-audio" controls></audio></div>
+      <div class="legenda-box" id="voz-legenda-box">
+        <label>Legenda para Instagram</label>
+        <textarea id="voz-legenda" readonly></textarea>
+        <button class="btn btn-secundaria" style="margin-top:8px" id="voz-copiar">📋 Copiar legenda</button>
+      </div>
+      <div class="upsell" id="voz-upsell">
+        <div class="upsell-titulo">✓ Prévia pronta! Quer a versão premium?</div>
+        <ul class="upsell-lista">
+          <li>Voz ElevenLabs com emoção e naturalidade</li>
+          <li>Clonagem de voz a partir de 30s de áudio</li>
+          <li>Sem limite de caracteres</li>
+        </ul>
+        <a class="btn btn-primaria" href="/calculadora.html?modelo=elevenlabs-flash">Produzir com qualidade — a partir de R$ 0,75</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- VÍDEO -->
+  <section class="painel" id="p-video">
+    <div class="card">
+      <label for="vid-narracao">Texto da narração (com gírias)</label>
+      <textarea id="vid-narracao" placeholder="Oxe, esse produto chegou pra ficar, visse!"></textarea>
+      <div class="grid2">
+        <div><label for="vid-cta">Texto na tela (CTA)</label><input id="vid-cta" type="text" placeholder="OFERTA IMPERDÍVEL"></div>
+        <div><label for="vid-preco">Preço</label><input id="vid-preco" type="text" placeholder="R$ 89,90"></div>
+      </div>
+      <label>Imagem de fundo</label>
+      <div class="drop" id="vid-drop">Arraste uma imagem ou clique<input type="file" accept="image/*" id="vid-file"></div>
+      <div class="arquivos-lista" id="vid-arquivos"></div>
+      <div class="grid2">
+        <div><label for="vid-voz">Voz</label>
+          <select id="vid-voz">
+            <option value="pt-BR-FranciscaNeural">Francisca</option>
+            <option value="pt-BR-AntonioNeural">Antonio</option>
+            <option value="pt-BR-ThalitaMultilingualNeural">Thalita</option>
+          </select></div>
+        <div><label for="vid-duracao">Duração (segundos)</label><input id="vid-duracao" type="number" min="5" max="15" value="10"></div>
+      </div>
+      <button class="btn btn-primaria" id="vid-btn" style="margin-top:16px">🎬 Gerar prévia de vídeo</button>
+      <div class="status" id="vid-status"></div>
+      <div class="player-area" id="vid-player"><video id="vid-video" controls></video></div>
+      <div class="upsell" id="vid-upsell">
+        <div class="upsell-titulo">✓ Prévia do vídeo pronta! Quer a versão completa?</div>
+        <ul class="upsell-lista">
+          <li>Vídeo gerado por IA (Pruna/MiniMax)</li>
+          <li>Avatar animado falando</li>
+          <li>Resolução 1080p sem marca d'água</li>
+        </ul>
+        <a class="btn btn-primaria" href="/calculadora.html?modelo=pruna-video-padrao">Produzir vídeo completo — a partir de R$ 0,10/seg</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MÚSICA -->
+  <section class="painel" id="p-musica">
+    <div class="card">
+      <label for="mus-clima">Qual o clima?</label>
+      <select id="mus-clima">
+        <option value="animado">🔥 Animado</option>
+        <option value="relaxado">😌 Relaxado</option>
+        <option value="urbano">🎤 Urbano</option>
+        <option value="inspirador">✨ Inspirador</option>
+      </select>
+      <label>Sua trilha (MP3) — opcional</label>
+      <div class="drop" id="mus-drop">Arraste um beat ou clique<input type="file" accept="audio/*" id="mus-file"></div>
+      <div class="arquivos-lista" id="mus-arquivos"></div>
+      <label for="mus-voz-texto">Voz por cima da trilha — opcional</label>
+      <textarea id="mus-voz-texto" placeholder="Deixe vazio para só ouvir o beat"></textarea>
+      <div class="grid2">
+        <div><label for="mus-voz">Voz</label>
+          <select id="mus-voz">
+            <option value="pt-BR-FranciscaNeural">Francisca</option>
+            <option value="pt-BR-AntonioNeural">Antonio</option>
+            <option value="pt-BR-ThalitaMultilingualNeural">Thalita</option>
+          </select></div>
+        <div><label for="mus-volume">Volume da trilha</label>
+          <select id="mus-volume">
+            <option value="0.08">Suave (8%)</option>
+            <option value="0.12" selected>Normal (12%)</option>
+            <option value="0.20">Forte (20%)</option>
+          </select></div>
+      </div>
+      <button class="btn btn-primaria" id="mus-btn" style="margin-top:16px">🎵 Gerar prévia</button>
+      <div class="status" id="mus-status"></div>
+      <div class="player-area" id="mus-player"><audio id="mus-audio" controls></audio></div>
+      <div class="upsell" id="mus-upsell">
+        <div class="upsell-titulo">✓ Prévia da trilha pronta!</div>
+        <ul class="upsell-lista">
+          <li>Música original gerada por IA (ElevenLabs Music)</li>
+          <li>Composição personalizada para seu projeto</li>
+        </ul>
+        <a class="btn btn-primaria" href="/calculadora.html?modelo=elevenlabs-music">Produzir música original — R$ 2,50/faixa</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMAGEM -->
+  <section class="painel" id="p-imagem">
+    <div class="card">
+      <label for="img-desc">Descreva a imagem</label>
+      <textarea id="img-desc" placeholder="Um vendedor nordestino sorrindo com produtos tropicais"></textarea>
+      <label>Imagem base (opcional — para editar)</label>
+      <div class="drop" id="img-drop">Arraste uma imagem ou clique<input type="file" accept="image/*" id="img-file"></div>
+      <div class="arquivos-lista" id="img-arquivos"></div>
+      <div class="grid2">
+        <div><label for="img-cta">Texto na imagem</label><input id="img-cta" type="text" placeholder="OFERTA"></div>
+        <div><label for="img-preco">Preço na imagem</label><input id="img-preco" type="text" placeholder="R$ 89,90"></div>
+      </div>
+      <button class="btn btn-primaria" id="img-btn" style="margin-top:16px">🖼️ Gerar prévia</button>
+      <div class="status" id="img-status"></div>
+      <div class="player-area" id="img-player"><img id="img-result" class="preview-img" alt="Prévia gerada"></div>
+      <div class="upsell" id="img-upsell">
+        <div class="upsell-titulo">✓ Prévia da imagem pronta!</div>
+        <ul class="upsell-lista">
+          <li>Imagem 4K gerada por IA (Bria/Krea)</li>
+          <li>Edição e ajustes profissionais</li>
+        </ul>
+        <a class="btn btn-primaria" href="/calculadora.html?modelo=bria-generate">Produzir imagem em alta resolução — R$ 1,90</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODO AVANÇADO -->
+  <div class="avancado-toggle">
+    <button class="btn btn-ghost" id="avancado-btn">⚙️ Modo avançado (editor de código)</button>
+  </div>
+  <div class="avancado-box" id="avancado-box">
+    <div class="card">
+      <label for="adv-codigo">Seu código Python (roda no servidor)</label>
+      <textarea id="adv-codigo" spellcheck="false">print("Olá, laboratório")</textarea>
+      <label>Arquivos para enviar</label>
+      <div class="drop" id="adv-drop">Arraste arquivos ou clique<input type="file" multiple id="adv-file"></div>
+      <div class="arquivos-lista" id="adv-arquivos"></div>
+      <button class="btn btn-primaria" id="adv-btn" style="margin-top:14px">▶ Rodar</button>
+      <div class="status" id="adv-status"></div>
+      <label>Saída</label>
+      <pre id="adv-saida" style="background:#080d18;border:1px solid var(--line);border-radius:8px;padding:12px;min-height:80px;max-height:300px;overflow:auto;white-space:pre-wrap;font:13px Consolas,monospace;margin-top:6px"></pre>
+      <div id="adv-downloads"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Sala VIP do <strong>Espaço Fora do Espaço</strong> — prévias gratuitas, produção premium.</p>
+    <p style="margin-top:6px"><a href="/calculadora.html">Ir para a calculadora de produção</a></p>
+    <p id="girias-count" style="margin-top:8px"></p>
+  </footer>
+</main>
+
+<script>
+// CONFIG — troque pela URL do seu backend quando deployar
+const SANDBOX = "http://localhost:8080"; // ← Render/Fly.io URL aqui
+
+// GÍRIAS POR REGIÃO
+const GIRIAS = {
+  norte: ["égua","pavulagem","leso","gaiato","de rocha","boró","visagem","curumim","égua da tapa","ficar de molho"],
+  nordeste: ["oxe","oxente","visse","arretado","aperreado","resenha","mangar","mói","mainha","painho","liso","cabra","cabra da peste","perrengue","fuleragem"],
+  sudeste: ["mano","mana","mina","trampo","trampar","rolê","busão","quebrada","trem","uai"],
+  sul: ["bah","tchê","guri","guria","tri","butiá","capanga","pucherito","preparar o chimarrão"]
+};
+
+// CONVERSÃO DE PREÇOS PARA EXTENSO
+const UNI=["zero","um","dois","três","quatro","cinco","seis","sete","oito","nove","dez","onze","doze","treze","quatorze","quinze","dezesseis","dezessete","dezoito","dezenove","vinte","trinta","quarenta","cinquenta","sessenta","setenta","oitenta","noventa"];
+function num2ext(n){
+  n=String(n).replace(/\D/g,"");
+  if(+n<=20)return UNI[+n]||n;
+  if(+n<100){const d=Math.floor(+n/10)*10,u=+n%10;return u?UNI[d]+" e "+UNI[u]:UNI[d]}
+  if(+n<1000){const c=Math.floor(+n/100)*100,r=+n%100;const cn={100:"cem",200:"duzentos",300:"trezentos",400:"quatrocentos",500:"quinhentos",600:"seiscentos",700:"setecentos",800:"oitocentos",900:"novecentos"}[c];return r?cn+" e "+num2ext(r):cn}
+  return n;
+}
+function preco2ext(txt){
+  return txt.replace(/r\$\s*([\d.,]+)/gi,(m,v)=>{
+    v=v.replace(/\./g,"").replace(",",".");
+    const f=parseFloat(v);if(isNaN(f))return m;
+    const i=Math.floor(f),d=Math.round((f-i)*100);
+    let r=num2ext(i)+" reais";
+    if(d)r+=" e "+num2ext(d)+" centavos";
+    return r;
+  });
+}
+
+// HELPERS
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+function statusEl(id,msg,ok){const e=$(id);e.textContent=msg;e.className="status"+(ok===false?" erro":ok?" ok":"")}
+function showPlayer(id){$(id).classList.add("ativo")}
+function showUpsell(id){$(id).classList.add("ativo")}
+function b64ToBlob(b64,mime){const bin=atob(b64);const arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime||"application/octet-stream"})}
+
+// NAVEGAÇÃO ENTRE ABAS
+$$(".tab").forEach(t=>t.onclick=()=>{
+  $$(".tab").forEach(x=>x.classList.remove("ativa"));
+  $$(".painel").forEach(x=>x.classList.remove("ativo"));
+  t.classList.add("ativa");
+  $("#p-"+t.dataset.tab).classList.add("ativo");
+});
+
+// GÍRIAS — BADGES POR REGIÃO
+let regiaoAtual="norte";
+function renderGirias(){
+  const box=$("#girias-badges");
+  box.innerHTML=GIRIAS[regiaoAtual].map(g=>`<span class="giria-badge" data-g="${esc(g)}">${esc(g)}</span>`).join("");
+  box.querySelectorAll(".giria-badge").forEach(b=>b.onclick=()=>{
+    const ta=$("#voz-texto");
+    const g=b.dataset.g;
+    const pos=ta.selectionStart||ta.value.length;
+    ta.value=ta.value.slice(0,pos)+g+" "+ta.value.slice(pos);
+    ta.focus();
+    b.classList.add("usada");
+  });
+}
+$$("#reg-tabs .regiao-tab").forEach(t=>t.onclick=()=>{
+  $$("#reg-tabs .regiao-tab").forEach(x=>x.classList.remove("ativa"));
+  t.classList.add("ativa");
+  regiaoAtual=t.dataset.reg;
+  renderGirias();
+});
+renderGirias();
+
+// UPLOAD DE ARQUIVOS
+function setupDrop(dropId,fileId,listId){
+  const drop=$(dropId),input=$(fileId),list=$(listId);
+  let arquivos=[];
+  drop.onclick=()=>input.click();
+  drop.ondragover=e=>{e.preventDefault();drop.classList.add("sobre")};
+  drop.ondragleave=()=>drop.classList.remove("sobre");
+  drop.ondrop=e=>{e.preventDefault();drop.classList.remove("sobre");addFiles(e.dataTransfer.files)};
+  input.onchange=e=>addFiles(e.target.files);
+  function addFiles(fs){arquivos=[...arquivos,...fs];renderList()}
+  function renderList(){
+    list.innerHTML=arquivos.map((f,i)=>`<div class="arq-item"><span>${esc(f.name)} (${(f.size/1024).toFixed(0)}KB)</span><button data-i="${i}">✕</button></div>`).join("");
+    list.querySelectorAll("button").forEach(b=>b.onclick=()=>{arquivos.splice(+b.dataset.i,1);renderList()});
+  }
+  return{get:()=>arquivos,clear:()=>{arquivos=[];renderList()}};
+}
+
+// ABA VOZ
+$("#voz-btn").onclick=async()=>{
+  const texto=preco2ext($("#voz-texto").value.trim());
+  if(!texto){statusEl("#voz-status","Digite um texto.",false);return}
+  const btn=$("#voz-btn");btn.disabled=true;
+  statusEl("#voz-status","Gerando voz...");
+  try{
+    const r=await fetch(SANDBOX+"/api/voz",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({texto,voz:$("#voz-voz").value,girias:true})
+    });
+    if(!r.ok){const j=await r.json().catch(()=>{});statusEl("#voz-status",j?.erro||"Erro ao gerar voz.",false);return}
+    const blob=await r.blob();
+    $("#voz-audio").src=URL.createObjectURL(blob);
+    showPlayer("#voz-player");showUpsell("#voz-upsell");
+    statusEl("#voz-status","Voz pronta.",true);
+    $("#voz-audio").play();
+  }catch(e){statusEl("#voz-status","Não foi possível conectar ao servidor.",false)}
+  finally{btn.disabled=false}
+};
+$("#voz-legenda-btn").onclick=()=>{
+  const texto=$("#voz-texto").value.trim();
+  if(!texto){statusEl("#voz-status","Digite um texto primeiro.",false);return}
+  $("#voz-legenda").value=`${texto}\n\n💰 Preço: [informar]\n🔗 Link na bio\n\n#achadinhos #oferta #espacoforadoespaco`;
+  $("#voz-legenda-box").classList.add("ativo");
+  statusEl("#voz-status","Legenda gerada.",true);
+};
+$("#voz-copiar").onclick=()=>{navigator.clipboard.writeText($("#voz-legenda").value);statusEl("#voz-status","Legenda copiada!",true)};
+
+// ABA VÍDEO
+const vidUpload=setupDrop("#vid-drop","#vid-file","#vid-arquivos");
+$("#vid-btn").onclick=async()=>{
+  const texto=preco2ext($("#vid-narracao").value.trim());
+  if(!texto){statusEl("#vid-status","Escreva a narração.",false);return}
+  const arqs=vidUpload.get();
+  if(!arqs.length){statusEl("#vid-status","Suba uma imagem de fundo.",false);return}
+  const cta=$("#vid-cta").value||"",preco=$("#vid-preco").value||"",voz=$("#vid-voz").value;
+  const dur=parseInt($("#vid-duracao").value)||10,imgName=arqs[0].name;
+  const btn=$("#vid-btn");btn.disabled=true;
+  statusEl("#vid-status","Compondo vídeo...");
+  const script=`import edge_tts,asyncio,subprocess,os
+async def v():
+ await edge_tts.Communicate(${JSON.stringify(texto)},${JSON.stringify(voz)}).save("v.mp3")
+asyncio.run(v())
+subprocess.run(["ffmpeg","-y","-loop","1","-i",${JSON.stringify(imgName)},"-i","v.mp3",
+ "-c:v","libx264","-tune","stillimage","-c:a","aac","-b:a","128k","-pix_fmt","yuv420p",
+ "-t",${JSON.stringify(String(dur))},
+ "-vf","drawtext=text=${JSON.stringify(cta).replace(/"/g,'\\"')}:fontsize=60:fontcolor=white:x=(w-text_w)/2:y=80:box=1:boxcolor=black@0.5:boxborderw=10,drawtext=text=${JSON.stringify(preco).replace(/"/g,'\\"')}:fontsize=80:fontcolor=gold:x=(w-text_w)/2:y=h-200:box=1:boxcolor=black@0.5:boxborderw=10",
+ "out.mp4"],timeout=15,check=True)
+print("ok")`;
+  const fd=new FormData();fd.append("codigo",script);
+  arqs.forEach(f=>fd.append("arquivos",f));
+  try{
+    const r=await fetch(SANDBOX+"/api/rodar",{method:"POST",body:fd});
+    const j=await r.json();
+    if(j.erro){statusEl("#vid-status",j.erro,false);return}
+    const vid=j.arquivos?.find(a=>a.nome==="out.mp4");
+    if(!vid){statusEl("#vid-status","Vídeo não foi gerado.",false);return}
+    $("#vid-video").src=URL.createObjectURL(b64ToBlob(vid.b64,"video/mp4"));
+    showPlayer("#vid-player");showUpsell("#vid-upsell");
+    statusEl("#vid-status","Vídeo pronto.",true);
+  }catch(e){statusEl("#vid-status","Não foi possível conectar.",false)}
+  finally{btn.disabled=false}
+};
+
+// ABA MÚSICA
+const musUpload=setupDrop("#mus-drop","#mus-file","#mus-arquivos");
+$("#mus-btn").onclick=async()=>{
+  const vozTexto=preco2ext($("#mus-voz-texto").value.trim());
+  const arqs=musUpload.get(),vol=$("#mus-volume").value;
+  const btn=$("#mus-btn");btn.disabled=true;
+  statusEl("#mus-status","Gerando prévia...");
+  let script;
+  if(vozTexto&&arqs.length){
+    script=`import edge_tts,asyncio,subprocess
+async def v():
+ await edge_tts.Communicate(${JSON.stringify(vozTexto)},${JSON.stringify($("#mus-voz").value)}).save("v.mp3")
+asyncio.run(v())
+subprocess.run(["ffmpeg","-y","-i",${JSON.stringify(arqs[0].name)},"-i","v.mp3",
+ "-filter_complex","[0:a]volume=${vol}[b];[1:a]volume=1.0[vo];[b][vo]amix=inputs=2:duration=shortest",
+ "-c:a","libmp3lame","-q:a","2","out.mp3"],timeout=15,check=True)
+print("ok")`;
+  }else if(arqs.length){
+    script=`import subprocess
+subprocess.run(["ffmpeg","-y","-i",${JSON.stringify(arqs[0].name)},"-t","15","-c:a","libmp3lame","-q:a","2","out.mp3"],timeout=15,check=True)
+print("ok")`;
+  }else{
+    script=`import subprocess
+subprocess.run(["ffmpeg","-y","-f","lavfi","-i","sine=frequency=440:duration=3","-c:a","libmp3lame","-q:a","2","out.mp3"],timeout=10,check=True)
+print("ok")`;
+  }
+  const fd=new FormData();fd.append("codigo",script);
+  arqs.forEach(f=>fd.append("arquivos",f));
+  try{
+    const r=await fetch(SANDBOX+"/api/rodar",{method:"POST",body:fd});
+    const j=await r.json();
+    if(j.erro){statusEl("#mus-status",j.erro,false);return}
+    const aud=j.arquivos?.find(a=>a.nome.endsWith(".mp3"));
+    if(!aud){statusEl("#mus-status","Áudio não gerado.",false);return}
+    $("#mus-audio").src=URL.createObjectURL(b64ToBlob(aud.b64,"audio/mpeg"));
+    showPlayer("#mus-player");showUpsell("#mus-upsell");
+    statusEl("#mus-status","Prévia pronta.",true);
+  }catch(e){statusEl("#mus-status","Não foi possível conectar.",false)}
+  finally{btn.disabled=false}
+};
+
+// ABA IMAGEM
+const imgUpload=setupDrop("#img-drop","#img-file","#img-arquivos");
+$("#img-btn").onclick=async()=>{
+  const desc=$("#img-desc").value.trim(),cta=$("#img-cta").value||"",preco=$("#img-preco").value||"";
+  const arqs=imgUpload.get();
+  const btn=$("#img-btn");btn.disabled=true;
+  statusEl("#img-status","Gerando imagem...");
+  let script;
+  if(arqs.length){
+    script=`from PIL import Image,ImageDraw,ImageFont
+img=Image.open(${JSON.stringify(arqs[0].name)}).convert("RGB")
+img=img.resize((1080,1080))
+d=ImageDraw.Draw(img)
+try:f1=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",72)
+except:f1=ImageFont.load_default()
+try:f2=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",100)
+except:f2=ImageFont.load_default()
+${cta?`d.text((540,60),${JSON.stringify(cta)},fill="white",font=f1,anchor="mm",stroke_width=3,stroke_fill="black")`:""}
+${preco?`d.text((540,1000),${JSON.stringify(preco)},fill="#FFD700",font=f2,anchor="mm",stroke_width=4,stroke_fill="black")`:""}
+img.save("out.png")
+print("ok")`;
+  }else{
+    script=`from PIL import Image,ImageDraw,ImageFont
+img=Image.new("RGB",(1080,1080),(15,23,42))
+d=ImageDraw.Draw(img)
+try:f=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",48)
+except:f=ImageFont.load_default()
+d.text((540,400),${JSON.stringify(desc.slice(0,80))},fill="white",font=f,anchor="mm",align="center")
+${cta?`d.text((540,500),${JSON.stringify(cta)},fill="#8ff0c5",font=f,anchor="mm")`:""}
+${preco?`d.text((540,600),${JSON.stringify(preco)},fill="#FFD700",font=f,anchor="mm")`:""}
+img.save("out.png")
+print("ok")`;
+  }
+  const fd=new FormData();fd.append("codigo",script);
+  arqs.forEach(f=>fd.append("arquivos",f));
+  try{
+    const r=await fetch(SANDBOX+"/api/rodar",{method:"POST",body:fd});
+    const j=await r.json();
+    if(j.erro){statusEl("#img-status",j.erro,false);return}
+    const img=j.arquivos?.find(a=>a.nome.endsWith(".png"));
+    if(!img){statusEl("#img-status","Imagem não gerada.",false);return}
+    $("#img-result").src=URL.createObjectURL(b64ToBlob(img.b64,"image/png"));
+    showPlayer("#img-player");showUpsell("#img-upsell");
+    statusEl("#img-status","Imagem pronta.",true);
+  }catch(e){statusEl("#img-status","Não foi possível conectar.",false)}
+  finally{btn.disabled=false}
+};
+
+// MODO AVANÇADO
+$("#avancado-btn").onclick=()=>{
+  const box=$("#avancado-box");
+  box.classList.toggle("ativo");
+  $("#avancado-btn").textContent=box.classList.contains("ativo")?"⚙️ Fechar modo avançado":"⚙️ Modo avançado (editor de código)";
+};
+const advUpload=setupDrop("#adv-drop","#adv-file","#adv-arquivos");
+$("#adv-btn").onclick=async()=>{
+  const codigo=$("#adv-codigo").value;
+  if(!codigo.trim()){statusEl("#adv-status","Escreva um código.",false);return}
+  const btn=$("#adv-btn");btn.disabled=true;
+  statusEl("#adv-status","Rodando...");
+  $("#adv-saida").textContent="";$("#adv-downloads").innerHTML="";
+  const fd=new FormData();fd.append("codigo",codigo);
+  advUpload.get().forEach(f=>fd.append("arquivos",f));
+  try{
+    const r=await fetch(SANDBOX+"/api/rodar",{method:"POST",body:fd});
+    const j=await r.json();
+    $("#adv-saida").textContent=(j.saida||"")+(j.erro?"\n"+j.erro:"");
+    statusEl("#adv-status",j.codigo===0?"Terminou.":"Terminou com erro.",j.codigo===0);
+    (j.arquivos||[]).forEach(a=>{
+      const a2=document.createElement("a");
+      a2.href=URL.createObjectURL(b64ToBlob(a.b64));
+      a2.download=a.nome;a2.textContent="⬇ "+a.nome;
+      a2.className="btn btn-secundaria";a2.style.margin="4px";
+      $("#adv-downloads").append(a2);
+    });
+  }catch(e){statusEl("#adv-status","Não foi possível conectar.",false)}
+  finally{btn.disabled=false}
+};
+
+// STATUS — contagem de gírias
+fetch(SANDBOX+"/api/status").then(r=>r.json()).then(s=>{
+  if(s.girias)$("#girias-count").textContent=`${s.girias} gírias regionais carregadas (${s.fonte})`;
+}).catch(()=>{});
+</script>
 </body>
 </html>
