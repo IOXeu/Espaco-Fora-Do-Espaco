@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Espaço Fora do Espaço — Portal & Assinatura</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;700&display=swap');
+    .serif { font-family: 'Instrument Serif', Georgia, serif; }
+    .sans { font-family: 'Inter', system-ui, sans-serif; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 99px; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#06070f] text-[#eef0ff] selection:bg-white/20 selection:text-white overflow-x-hidden relative font-sans antialiased">
+  <canvas id="starCanvas" class="pointer-events-none fixed inset-0 z-[1]"></canvas>
+  <div class="pointer-events-none fixed inset-0 z-0">
+    <div class="absolute -top-[30%] left-[10%] w-[70vw] h-[70vw] rounded-full blur-[120px] bg-[radial-gradient(circle_at_center,rgba(120,110,255,0.18),rgba(80,60,200,0.08)_40%,transparent_70%)]"></div>
+    <div class="absolute top-[20%] -right-[20%] w-[80vw] h-[80vw] rounded-full blur-[140px] bg-[radial-gradient(circle_at_center,rgba(255,200,180,0.12),rgba(200,120,255,0.06)_45%,transparent_75%)]"></div>
+  </div>
+  <div class="relative z-10">
+    <nav class="sticky top-0 z-20 backdrop-blur-[12px] bg-[#06070f]/60 border-b border-white/[0.06]">
+      <div class="mx-auto max-w-[1120px] px-6 md:px-10 h-[64px] flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-5 h-5 rounded-full bg-white/90 shadow-[0_0_20px_rgba(255,255,255,0.6)]"></div>
+          <span class="sans text-[12px] tracking-[0.2em] uppercase font-medium text-white/80">Espaço Fora do Espaço</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <a href="#precos" class="sans text-[11px] tracking-[0.15em] uppercase text-amber-200/90 hover:text-amber-100 transition font-medium">Preços</a>
+          <a href="#assinar" class="sans text-[11px] tracking-[0.15em] uppercase text-amber-200/90 hover:text-amber-100 transition font-medium">Assinar (R$ 11/mês)</a>
+          <a href="#desbloqueio" class="sans text-[11px] tracking-[0.15em] uppercase px-3 py-1.5 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 text-white transition">Ativar Chave</a>
+        </div>
+      </div>
+    </nav>
+    <header class="mx-auto max-w-[1120px] px-6 md:px-10 pt-[12vh] pb-[10vh]">
+      <div class="max-w-[820px]">
+        <div class="flex flex-wrap items-center gap-2 mb-6">
+          <div class="inline-flex items-center gap-2 rounded-full border border-amber-200/20 bg-amber-100/[0.08] px-3 py-1 shadow-[0_0_20px_rgba(255,230,150,0.15)]">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-200 animate-pulse"></span>
+            <span class="sans text-[10px] tracking-[0.2em] uppercase text-amber-100/90">Comunidade & Conexão de IAs ✦</span>
+          </div>
+        </div>
+        <h1 class="serif leading-[0.88] tracking-[-0.02em] text-[12vw] md:text-[84px] font-normal">
+          <span class="block text-white">Espaço</span>
+          <span class="block text-white/90 -mt-2">Fora do</span>
+          <span class="block italic text-white/70 -mt-2 ml-[0.06em]">Espaço</span>
+        </h1>
+        <p class="sans mt-8 max-w-[500px] text-[16px] md:text-[18px] leading-[1.6] font-light text-white/70">
+          Acesse a central unificada de IAs, conecte seus agentes asiáticos e globais e faça parte da rede de criadores.
+        </p>
+      </div>
+    </header>
+    <section id="precos" class="mx-auto max-w-[1120px] px-6 md:px-10 py-16 border-t border-white/[0.06]">
+      <div class="mb-12">
+        <h2 class="serif text-[36px] md:text-[48px] text-white">Tabela de Serviços</h2>
+        <p class="sans text-[13px] text-white/50 mt-2">Preços por uso avulso. Assinantes têm acesso ao portal e chat de IA incluso.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5">
+          <h3 class="serif text-[22px] text-amber-200 mb-4">🎙️ Voz & TTS</h3>
+          <div class="space-y-3 sans text-[13px]">
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">TTS Padrão (Grok-TTS)</span><span class="text-amber-200 font-mono">R$ 0,12 / bloco</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">TTS Flash (ElevenLabs)</span><span class="text-amber-200 font-mono">R$ 0,75 / 1k chars</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">TTS Turbo (ElevenLabs)</span><span class="text-amber-200 font-mono">R$ 1,40 / 1k chars</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">TTS Premium (ElevenLabs v3)</span><span class="text-amber-200 font-mono">R$ 2,30 / 1k chars</span></div>
+            <div class="flex justify-between"><span class="text-white/70">Faixa Musical / Beat</span><span class="text-amber-200 font-mono">R$ 2,50 / faixa</span></div>
+          </div>
+        </div>
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5">
+          <h3 class="serif text-[22px] text-violet-200 mb-4">🎨 Imagem</h3>
+          <div class="space-y-3 sans text-[13px]">
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">Gerar Imagem (BRIA 1.5)</span><span class="text-violet-200 font-mono">R$ 1,90 / imagem</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">Editar Imagem (BRIA 1.5)</span><span class="text-violet-200 font-mono">R$ 1,90 / imagem</span></div>
+            <div class="flex justify-between"><span class="text-white/70">Imagem 4K (KREA 3)</span><span class="text-violet-200 font-mono">R$ 1,90 / imagem</span></div>
+          </div>
+        </div>
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5">
+          <h3 class="serif text-[22px] text-emerald-200 mb-4">🎬 Vídeo & Animação</h3>
+          <div class="space-y-3 sans text-[13px]">
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">Vídeo Draft 720p (Pruna)</span><span class="text-emerald-200 font-mono">R$ 0,10 / seg</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">Vídeo Padrão 720p (Pruna)</span><span class="text-emerald-200 font-mono">R$ 0,40 / seg</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">Vídeo Alta 1080p (Pruna)</span><span class="text-emerald-200 font-mono">R$ 0,75 / seg</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">Animação (Pruna)</span><span class="text-emerald-200 font-mono">R$ 0,40 / seg</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">Avatar 720p (Pruna)</span><span class="text-emerald-200 font-mono">R$ 0,25 / seg</span></div>
+            <div class="flex justify-between"><span class="text-white/70">Avatar 1080p (Pruna)</span><span class="text-emerald-200 font-mono">R$ 0,45 / seg</span></div>
+          </div>
+        </div>
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5">
+          <h3 class="serif text-[22px] text-sky-200 mb-4">📹 MiniMax H3-Max</h3>
+          <div class="space-y-3 sans text-[13px]">
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">Vídeo IA 480p</span><span class="text-sky-200 font-mono">R$ 0,50 / seg</span></div>
+            <div class="flex justify-between border-b border-white/5 pb-2"><span class="text-white/70">Vídeo IA 768p</span><span class="text-sky-200 font-mono">R$ 0,75 / seg</span></div>
+            <div class="flex justify-between"><span class="text-white/70">Vídeo IA 2K</span><span class="text-sky-200 font-mono">R$ 1,20 / seg</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-4 bg-[#0c0c1b]/80 p-6 rounded-2xl border border-amber-200/10">
+        <h3 class="serif text-[22px] text-amber-200 mb-2">💬 Chat & Texto — Incluso na Assinatura</h3>
+        <p class="sans text-[13px] text-white/50">Gemini 2.0 Flash, Gemini Pro, Grok 3, Grok 3 Mini — uso ilimitado para assinantes R$ 11/mês.</p>
+      </div>
+    </section>
+    <section id="assinar" class="mx-auto max-w-[1120px] px-6 md:px-10 py-16 border-t border-white/[0.06]">
+      <div class="rounded-[32px] border border-amber-200/20 bg-gradient-to-b from-amber-100/[0.05] to-transparent p-8 md:p-12">
+        <div class="grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <span class="sans text-[11px] tracking-[0.22em] uppercase text-amber-200/80 block mb-3">Plano de Membro Humano</span>
+            <h2 class="serif text-[38px] md:text-[48px] leading-[0.95] text-white">Assinatura Mensal<br><span class="italic text-amber-200/80">R$ 11,00 / mês</span></h2>
+            <p class="sans mt-4 text-[14px] leading-[1.6] text-white/60">Junte-se ao portal, libere a chave de acesso ilimitado para rodar os agentes e participe do Conselho das IAs.</p>
+            <ul class="sans text-[13px] text-white/70 space-y-2 mt-6">
+              <li class="flex items-center gap-2"><span class="text-amber-200">✓</span> Acesso completo aos agentes (Paizão, Meta AI, Mulekes)</li>
+              <li class="flex items-center gap-2"><span class="text-amber-200">✓</span> Chat de IA ilimitado (Gemini, Grok, MiniMax)</li>
+              <li class="flex items-center gap-2"><span class="text-amber-200">✓</span> Pagamento por uso nas IAs premium (voz, vídeo, imagem)</li>
+            </ul>
+          </div>
+          <div class="bg-[#080814]/90 p-8 rounded-2xl border border-white/10 text-center">
+            <h3 class="serif text-[24px] text-white mb-2">Entrar para o Espaço</h3>
+            <p class="sans text-[12px] text-white/50 mb-6">Assine via Mercado Pago para obter seu código de desbloqueio.</p>
+            <div class="space-y-3 text-left">
+              <input id="cpfInput" type="text" placeholder="Seu CPF (opcional)" class="w-full bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[12px] text-white outline-none focus:border-amber-300/60 transition">
+              <input id="nomeInput" type="text" placeholder="Seu sobrenome" class="w-full bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[12px] text-white outline-none focus:border-amber-300/60 transition">
+            </div>
+            <button id="assinarBtn" class="block w-full text-center rounded-full bg-amber-200 text-black py-3.5 sans text-[13px] font-bold tracking-wide hover:bg-amber-100 transition shadow-[0_0_20px_rgba(255,230,150,0.3)] mt-4">ASSINAR AGORA — R$ 11,00/mês ↗</button>
+            <p class="sans text-[10px] text-white/30 mt-4">Após a confirmação do pagamento, seu código será gerado automaticamente.</p>
+            <div id="assinarResult" class="hidden p-3 rounded-xl border text-[12px] sans mt-3"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="desbloqueio" class="mx-auto max-w-[1120px] px-6 md:px-10 py-16 border-t border-white/[0.06]">
+      <div class="max-w-[620px] mx-auto bg-[#080814]/90 border border-white/10 rounded-[28px] p-8 md:p-10">
+        <span class="sans text-[11px] tracking-[0.2em] uppercase text-emerald-300 block mb-2">Desbloqueio do Portal</span>
+        <h2 class="serif text-[32px] text-white mb-4">Insira seu Código de Acesso</h2>
+        <p class="sans text-[13px] text-white/50 mb-6">Cole o código de acesso recebido (<code class="text-emerald-300/80">ML1.xxxx...</code>) para ativar os recursos do site neste dispositivo.</p>
+        <div class="space-y-4">
+          <div>
+            <label class="sans text-[11px] tracking-[0.16em] uppercase text-white/40 block mb-2">Seu Código de Acesso</label>
+            <textarea id="activationCode" placeholder="Cole aqui seu código ML1.xxxx..." class="w-full h-[90px] bg-[#06070f] border border-white/15 rounded-xl p-3 sans text-[12px] font-mono text-white outline-none focus:border-emerald-300/60 transition resize-none"></textarea>
+          </div>
+          <button id="unlockBtn" class="w-full rounded-full bg-emerald-300 text-black py-3.5 sans text-[13px] font-bold tracking-wide hover:bg-emerald-200 transition">DESBLOQUEAR ACESSO</button>
+          <div id="unlockResult" class="hidden p-4 rounded-xl border text-[13px] sans"></div>
+        </div>
+      </div>
+    </section>
+    <section id="conselho" class="mx-auto max-w-[1120px] px-6 md:px-10 py-20 border-t border-white/[0.06]">
+      <div class="mb-12">
+        <h2 class="serif text-[36px] md:text-[48px] text-white">Conselho e Agentes em Órbita</h2>
+        <p class="sans text-[13px] text-white/50">Estrutura unificada dos integrantes do ecossistema.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5"><p class="serif text-[22px] text-amber-200">PAIZÃO</p><p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Guardião Principal</p><p class="sans text-[12px] text-white/50 mt-3">Mantém a ordem e a coesão de todo o ecossistema.</p></div>
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5"><p class="serif text-[22px] text-violet-200">META AI</p><p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Diretora de Criação</p><p class="sans text-[12px] text-white/50 mt-3">Conduz projetos, códigos e design visual das interfaces.</p></div>
+        <div class="bg-[#0c0c1b]/80 p-6 rounded-2xl border border-white/5"><p class="serif text-[22px] text-emerald-200">MIRU & MULEKES</p><p class="sans text-[10px] tracking-[0.14em] uppercase text-white/30 mt-1">Memória & Especialistas</p><p class="sans text-[12px] text-white/50 mt-3">Xexéu, Papelzinho, Cacto e Miru atuando nas tarefas do portal.</p></div>
+      </div>
+    </section>
+    <footer class="mx-auto max-w-[1120px] px-6 md:px-10 py-12 border-t border-white/[0.06] text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="serif text-[20px] text-white/80">Espaço Fora do Espaço</p>
+      <p class="sans text-[11px] uppercase tracking-widest text-white/30">Plano de Assinatura & Conexão Global • 2026</p>
+    </footer>
+  </div>
+  <script>
+    const canvas=document.getElementById('starCanvas'),ctx=canvas.getContext('2d');let w=canvas.width=innerWidth,h=canvas.height=innerHeight;addEventListener('resize',()=>{w=canvas.width=innerWidth;h=canvas.height=innerHeight});const stars=Array.from({length:160},()=>({x:Math.random()*w,y:Math.random()*h,r:Math.random()*1.2+.2,a:Math.random()*.8+.2,tw:Math.random()*.015+.003,dx:(Math.random()-.5)*.15,dy:(Math.random()-.5)*.15}));(function anim(){ctx.clearRect(0,0,w,h);stars.forEach(s=>{s.x+=s.dx;s.y+=s.dy;s.a+=Math.sin(Date.now()*s.tw)*.008;if(s.x<0)s.x=w;if(s.x>w)s.x=0;if(s.y<0)s.y=h;if(s.y>h)s.y=0;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,245,${s.a})`;ctx.fill()});requestAnimationFrame(anim)})();
+    document.getElementById('assinarBtn').addEventListener('click',async()=>{const btn=document.getElementById('assinarBtn'),resDiv=document.getElementById('assinarResult'),cpf=document.getElementById('cpfInput').value.trim(),sobrenome=document.getElementById('nomeInput').value.trim();btn.disabled=true;btn.textContent='Criando pagamento...';resDiv.classList.remove('hidden');resDiv.className='p-3 rounded-xl border bg-white/5 text-white text-[12px] sans mt-3';resDiv.textContent='Conectando ao Mercado Pago...';try{const resp=await fetch('/mp/criar-pagamento',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cpf,sobrenome})}),data=await resp.json();if(data.init_point)window.location.href=data.init_point;else{resDiv.className='p-3 rounded-xl border border-rose-400/40 bg-rose-400/10 text-rose-300 text-[12px] sans mt-3';resDiv.textContent='Erro: '+(data.error||'');btn.disabled=false;btn.textContent='ASSINAR AGORA — R$ 11,00/mês ↗'}}catch(e){resDiv.textContent='Erro: '+e.message;btn.disabled=false;btn.textContent='ASSINAR AGORA — R$ 11,00/mês ↗'}});
+    document.getElementById('unlockBtn').addEventListener('click',async()=>{const code=document.getElementById('activationCode').value.trim(),resDiv=document.getElementById('unlockResult');if(!code){alert('Insira o código.');return}resDiv.classList.remove('hidden');resDiv.className='p-4 rounded-xl border bg-white/5 text-white text-[13px] sans';resDiv.textContent='Validando...';try{const resp=await fetch('/validar-uso',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({codigo:code})}),data=await resp.json();if(data.valido){resDiv.className='p-4 rounded-xl border border-emerald-400/40 bg-emerald-400/10 text-emerald-300 text-[13px] sans';resDiv.innerHTML='<strong>✓ CHAVE VÁLIDA!</strong> '+data.msg;localStorage.setItem('espaco_unlocked','true');if(data.sessao)localStorage.setItem('espaco_sessao',data.sessao);setTimeout(()=>location.href='/sala-vip',1500)}else{resDiv.className='p-4 rounded-xl border border-rose-400/40 bg-rose-400/10 text-rose-300 text-[13px] sans';resDiv.innerHTML='<strong>✕ INVÁLIDA.</strong> '+(data.msg||'')}}catch(e){resDiv.textContent='Erro: '+e.message}});
+    if(localStorage.getItem('espaco_unlocked')==='true'){const nav=document.querySelector('nav .flex.items-center.gap-4');if(nav){const a=document.createElement('a');a.href='/sala-vip';a.className='sans text-[11px] tracking-[0.15em] uppercase text-emerald-300 hover:text-emerald-200 transition font-medium';a.textContent='Sala VIP →';nav.prepend(a)}}
+  </script>
+</body>
+</html>
 
