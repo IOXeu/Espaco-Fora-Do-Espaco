@@ -67,7 +67,7 @@ function json(data, status = 200) {
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Headers': 'Content-Type, X-Sessao',
     },
   });
 }
@@ -108,6 +108,35 @@ async function verifySignature(code) {
     return await crypto.subtle.verify(
       { name: 'ECDSA', hash: 'SHA-256' }, key,
       b64UrlToBuf(parts[2]), new TextEncoder().encode(`ML1.${parts[1]}`)
+    );
+  } catch { return false; }
+}
+
+// ---- Sessão: prova de que a pessoa desbloqueou a Sala VIP com um código válido ----
+const SESSAO_DIAS = 30; // dura como a assinatura mensal
+
+async function criarSessao(env) {
+  const exp = Date.now() + SESSAO_DIAS * 24 * 60 * 60 * 1000;
+  const payloadB64 = bufToB64Url(new TextEncoder().encode(JSON.stringify({ exp })));
+  const message = `ML1S.${payloadB64}`;
+  const key = await getSigningKey(env);
+  const signature = await signMessage(key, message);
+  return `${message}.${signature}`;
+}
+
+async function verificarSessao(token) {
+  if (!token || typeof token !== 'string') return false;
+  const parts = token.split('.');
+  if (parts.length !== 3 || parts[0] !== 'ML1S') return false;
+  try {
+    const { exp } = JSON.parse(new TextDecoder().decode(b64UrlToBuf(parts[1])));
+    if (!exp || Date.now() > exp) return false;
+    const key = await crypto.subtle.importKey(
+      'jwk', PUB_KEY_JWK, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']
+    );
+    return await crypto.subtle.verify(
+      { name: 'ECDSA', hash: 'SHA-256' }, key,
+      b64UrlToBuf(parts[2]), new TextEncoder().encode(`ML1S.${parts[1]}`)
     );
   } catch { return false; }
 }
@@ -205,12 +234,25 @@ async function validarUso(request, env) {
   }
   const isValid = await verifySignature(codigo);
   if (!isValid) return json({ valido: false, msg: '✕ Assinatura inválida ou chave falsa.' }, 403);
+  let sessao;
+  try { sessao = await criarSessao(env); }
+  catch { return json({ valido: false, msg: 'Erro interno ao liberar o acesso. Sua chave NÃO foi gasta, tente de novo.' }, 500); }
   await env.CHAVES_USADAS.put(codigo, JSON.stringify({ status: 'consumido', consumed: Date.now() }));
-  return json({ valido: true, msg: '✓ Acesso liberado à Sala VIP e IAs!' });
+  return json({ valido: true, msg: '✓ Acesso liberado à Sala VIP e IAs!', sessao });
 }
 
 async function proxyIA(request, env) {
+  // Só quem desbloqueou a Sala VIP pode usar as IAs (protege as suas chaves e créditos)
+  if (!(await verificarSessao(request.headers.get('X-Sessao')))) {
+    return json({ error: 'Acesso não autorizado. Desbloqueie a Sala VIP com o seu código.' }, 401);
+  }
   const { modelo, prompt, ...params } = await request.json();
+  if (typeof prompt !== 'string' || !prompt.trim() || prompt.length > 5000) {
+    return json({ error: 'Prompt vazio ou muito longo (máximo 5000 caracteres).' }, 400);
+  }
+  // Impede que o usuário troque o modelo (e o custo) por fora da tabela de preços
+  for (const k of ['model', 'model_id', 'messages', 'contents', 'stream']) delete params[k];
+  params.duracao = Math.min(Math.max(parseInt(params.duracao) || 10, 1), 120);
   const route = AI_ROUTES[modelo];
   if (!route) return json({ error: `Modelo '${modelo}' não encontrado`, modelos: Object.keys(PRECOS) }, 404);
   const apiKey = env[route.key];
@@ -358,7 +400,7 @@ export default {
     const method = request.method;
     if (method === 'OPTIONS') {
       return new Response(null, {
-        headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' },
+        headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, X-Sessao' },
       });
     }
     const routes = {
