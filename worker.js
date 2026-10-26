@@ -6,8 +6,8 @@ const PRECO_ASSINATURA = 11.00;
 
 const PUB_KEY_JWK = {
   kty: 'EC', crv: 'P-256',
-  x: 'brR9UVjpg32UbdPWGrDJWUJdcV88CxlPvO8ZMVoBKEU',
-  y: 'qI9ONeMlrOFpwW5k5sycpyxSbSPGOxGlXj4Bi0oavRQ',
+  x: 'ypG274HEyWt9hcEyHmNo8bsJNzrIv-ibjBF27lQ_hlA',
+  y: 'EAPCuAJujtcoMHCnkdZJCRG6tW14bgE6_SucbgGCAdc',
 };
 
 const PRECOS = {
